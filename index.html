@@ -2,25 +2,54 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym Tracker V86 Compact Perf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gym Tracker V93 Smooth Motion</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2d3436">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <style>
         /* --- VARIABLES --- */
-        :root { --bg-body: #f8f9fa; --bg-card: #ffffff; --text-main: #2d3436; --text-gray: #636e72; --input-bg: #f1f3f5; --shadow: 0 4px 20px rgba(0,0,0,0.04); --btn-default-bg: #e9ecef; --btn-default-text: #495057; --brand: #2d3436; --highlight: #ffeaa7; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; }
-        h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; font-size: 1.4rem; }
-        .container { max-width: 600px; margin: 0 auto; }
+        :root { --bg-body: #f8f9fa; --bg-card: #ffffff; --text-main: #2d3436; --text-gray: #636e72; --input-bg: #f1f3f5; --shadow: 0 4px 20px rgba(0,0,0,0.04); --btn-default-bg: #e9ecef; --btn-default-text: #495057; --brand: #2d3436; --highlight: #ffeaa7; --accent-green: #00b894; }
+        
+        /* GENERAL & RESET */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; overflow-x: hidden; }
+        h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; font-size: 1.4rem; letter-spacing: -0.5px; animation: fadeInDown 0.5s ease; }
+        
+        .container { max-width: 600px; margin: 0 auto; position: relative; }
         .hidden { display: none !important; }
         
-        select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); }
+        /* --- ANIMATIONS GLOBALES (V93) --- */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* Classes d'animation dynamiques JS */
+        .anim-right { animation: slideInRight 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .anim-left { animation: slideInLeft 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+        /* --- INPUTS & SELECTS --- */
+        select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); -webkit-appearance: none; appearance: none; cursor: pointer; transition: transform 0.1s; }
+        select:active { transform: scale(0.98); }
+        
         .input-wrapper { position: relative; flex: 1; min-width: 0; }
-        input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); box-sizing: border-box; transition: 0.3s; }
+        input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; }
         input:focus { outline: none; background: #fff; border-color: #dfe6e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .unit-label { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 700; color: #b2bec3; pointer-events: none; }
 
-        button { border: none; cursor: pointer; font-weight: 700; border-radius: 16px; transition: 0.2s; position: relative; overflow: hidden; }
-        button:active { transform: scale(0.96); opacity: 0.9; }
+        /* --- BOUTONS (EFFET SMOOTH V93) --- */
+        button, .btn-finish-exo, .hist-category-btn, .prog-item, .cal-day, .nav-item { 
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: none; 
+        }
+        button:active, .btn-finish-exo:active, .hist-category-btn:active, .prog-item:active, .cal-day:active, .nav-item:active { 
+            transform: scale(0.95); opacity: 0.8; 
+        }
+
+        button { border: none; font-weight: 700; border-radius: 16px; position: relative; overflow: hidden; }
         .btn-primary { width: 100%; padding: 15px; background: var(--text-main); color: #fff; font-size: 1rem; margin-top: 15px; }
         .btn-add { width: 100%; padding: 12px; background: #fff; border: 2px solid #f1f3f5; color: var(--text-main); margin-top: 5px; font-size: 0.9rem;}
         .btn-add:hover { border-color: #dee2e6; background: #f8f9fa; }
@@ -29,12 +58,13 @@
         .btn-cancel { background: transparent; color: #636e72; padding: 10px; width: 100%; margin-top: 5px; font-size: 0.8rem; }
         .btn-edit { background: #fff; color: #2d3436; border: 1px solid #dfe6e9; padding: 8px 16px; font-size: 0.8rem; border-radius: 14px; margin-right:8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .btn-finish-exo { width: 100%; padding: 16px; background-color: var(--btn-default-bg); color: var(--btn-default-text); font-size: 0.95rem; margin-top: 15px; transition: background-color 0.3s; }
+        .btn-finish-exo { width: 100%; padding: 16px; background-color: var(--btn-default-bg); color: var(--btn-default-text); font-size: 0.95rem; margin-top: 15px; border:none; border-radius: 16px; display:block; text-align:center;}
         .btn-finish-exo.validated { color: #fff !important; cursor: default; transform: none; box-shadow: none; }
         
-        .btn-terminate-session { width: 100%; padding: 18px; background-color: var(--brand); color: #fff; font-size: 1.1rem; margin-top: 40px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-terminate-session { width: 100%; padding: 18px; background-color: var(--brand); color: #fff; font-size: 1.1rem; margin-top: 40px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-radius: 20px; box-shadow: 0 10px 20px rgba(45, 52, 54, 0.15); }
 
-        .card { background: var(--bg-card); border-radius: 24px; box-shadow: var(--shadow); margin-bottom: 25px; padding: 20px; border-left: 10px solid #333; animation: fadeInUp 0.5s ease; }
+        /* --- CARDS & LISTS --- */
+        .card { background: var(--bg-card); border-radius: 24px; box-shadow: var(--shadow); margin-bottom: 25px; padding: 20px; border-left: 10px solid #333; animation: fadeInUp 0.4s ease backwards; }
         .card-header { display: flex; flex-direction: column; gap:8px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f1f1f1; }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .exo-title { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
@@ -52,39 +82,36 @@
         
         .drop-row { margin-top: 8px; animation: fadeInUp 0.3s ease; }
         .drop-icon { font-size: 1.2rem; font-weight: 900; cursor: pointer; color: var(--card-color); }
+        .last-perf { font-size: 0.75rem; color: #b2bec3; font-weight: 600; margin-top: 4px; margin-left: 45px; display: block; width: 100%; }
 
-        .last-perf {
-            font-size: 0.75rem;
-            color: #b2bec3;
-            font-weight: 600;
-            margin-top: 4px;
-            margin-left: 45px; 
-            display: block;
-            width: 100%;
-        }
+        /* --- CALENDRIER --- */
+        .calendar-wrapper { background: #fff; border-radius: 24px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px; animation: fadeInUp 0.4s ease; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-cal-nav { background: var(--input-bg); color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 10px; text-align: center; }
+        .cal-weekday { font-size: 0.8rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day { aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-weight: 600; font-size: 0.9rem; position: relative; background: #f8f9fa; color: #b2bec3; border: 2px solid transparent; }
+        .cal-day.active-month { background: #fff; color: var(--text-main); border-color: #f1f3f5; }
+        .cal-day.selected { background: #dfe6e9 !important; color: var(--text-main) !important; border-color: #b2bec3 !important; }
+        .cal-day.has-session::after { content: ''; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; position: absolute; bottom: 6px; transition: 0.2s; }
+        .cal-day.today { border: 2px solid var(--highlight) !important; color: var(--text-main) !important; }
+        .session-item-detail { background: #fff; padding: 15px; border-radius: 16px; margin-bottom: 10px; border-left: 5px solid var(--accent-green); box-shadow: 0 2px 5px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; animation: fadeInUp 0.3s ease; }
+        .session-item-detail span { font-weight: 700; color: var(--text-main); }
 
+        /* BUILDER & HISTO */
         .builder-btn { width: 100%; padding: 20px; background: #fff; color: var(--text-main); box-shadow: var(--shadow); margin-bottom: 25px; border-radius: 24px; font-size:1rem; border: 1px solid transparent; }
-        #builderArea { background: #fff; padding: 25px; border-radius: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+        #builderArea { background: #fff; padding: 25px; border-radius: 24px; margin-bottom: 20px; box-shadow: var(--shadow); animation: fadeInUp 0.3s ease; }
         .builder-block { background:#f8f9fa; padding:15px; border-radius: 16px; margin-bottom:10px; border:1px solid #eee; }
         .builder-row { display: flex; gap: 15px; margin-bottom: 10px; }
         .builder-label { font-size: 0.8rem; font-weight: 700; color: #b2bec3; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        
-        /* ITEM DU BUILDER */
-        .builder-item { 
-            background: #f8f9fa; border: 1px solid #eee; border-radius: 16px; 
-            margin-bottom: 10px; padding: 15px 40px 15px 15px; position: relative; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: grab; transition: 0.2s; touch-action: manipulation; 
-        }
-        .builder-item:active { cursor: grabbing; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .builder-item { background: #f8f9fa; border: 1px solid #eee; border-radius: 16px; margin-bottom: 10px; padding: 15px 40px 15px 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .builder-item.editing-active { border: 2px solid #fdcb6e; background-color: #fffbf0; transform: scale(1.02); }
-
-        .builder-click-zone { cursor: pointer; width: 100%; height: 100%; }
-        .builder-click-zone:active { opacity: 0.6; }
-        .delete-x { position: absolute; top: 12px; right: 15px; color: #ff6b6b; font-weight: 900; font-size: 1.1rem; cursor: pointer; z-index: 10; padding: 5px; }
+        .delete-x { position: absolute; top: 12px; right: 15px; color: #ff6b6b; font-weight: 900; font-size: 1.1rem; padding: 5px; }
         .builder-exo-name { display: block; font-weight: 800; font-size: 1rem; color: #2d3436; margin-bottom: 4px; }
         .builder-exo-info { display: block; font-size: 0.85rem; font-weight: 600; color: #636e72; }
 
-        .prog-item { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); cursor: pointer; }
+        .prog-item { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
         .prog-title { font-weight: 800; font-size: 1.1rem; color: #2d3436; }
         .prog-header-actions { display: flex; gap: 5px; }
         .prog-details-box { padding: 20px; background: #fff; margin-bottom: 20px; border-radius: 24px; box-shadow: var(--shadow); display: none; }
@@ -94,11 +121,11 @@
         .prog-line-name { font-weight: 700; color: #2d3436; font-size: 0.95rem; }
         .prog-line-info { color: #636e72; font-size: 0.85rem; font-weight: 600; }
 
-        .hist-category-btn { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 24px; box-shadow: var(--shadow); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s; }
+        .hist-category-btn { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 24px; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; animation: fadeInUp 0.3s ease backwards; }
         .hist-cat-title { font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
         .hist-count { background: var(--input-bg); color: #636e72; padding: 5px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; }
-        .btn-back-hist { display: inline-block; margin-bottom: 15px; font-weight: 700; color: var(--text-gray); background: var(--input-bg); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
-        .hist-session { background: #fff; border-radius: 24px; margin-bottom: 15px; box-shadow: var(--shadow); overflow: hidden; }
+        .btn-back-hist { display: inline-block; margin-bottom: 15px; font-weight: 700; color: var(--text-gray); background: var(--input-bg); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; }
+        .hist-session { background: #fff; border-radius: 24px; margin-bottom: 15px; box-shadow: var(--shadow); overflow: hidden; animation: fadeInUp 0.3s ease backwards; }
         .hist-header { padding: 20px; cursor: pointer; display: flex; align-items: center; background: #fff; }
         .hist-date-large { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
         .hist-body { display: none; padding: 0 20px 20px; border-top: 1px solid #f1f3f5; }
@@ -107,21 +134,17 @@
         .hist-exo-name { font-weight: 700; color: #2d3436; }
         .hist-exo-perf { color: #636e72; text-align: right; }
 
-        .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #fff; padding: 15px; border-radius: 30px; display: flex; justify-content: space-around; box-shadow: 0 10px 40px rgba(0,0,0,0.08); z-index: 999; }
-        .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; }
-        .nav-item.active { color: var(--text-main); }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2d3436">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png">
+        .backup-area { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #e9ecef; text-align: center; }
+        .btn-backup { background: #00b894; color: white; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; }
+        .btn-restore { background: #636e72; color: white; width: 100%; padding: 12px; font-size: 0.9rem; }
 
+        .nav-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #fff; padding: 15px; border-radius: 30px; display: flex; justify-content: space-around; box-shadow: 0 10px 40px rgba(0,0,0,0.08); z-index: 999; }
+        .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
+        .nav-item.active { color: var(--text-main); transform: scale(1.1); }
+    </style>
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log("Service Worker activé !"))
-          .catch((err) => console.log("Erreur SW :", err));
+        navigator.serviceWorker.register('sw.js').catch((err) => console.log(err));
       }
     </script>
 </head>
@@ -130,7 +153,7 @@
 <div class="container">
     <h1 id="mainTitle">Ma Séance</h1>
 
-    <div id="view-seance">
+    <div id="view-seance" class="app-view">
         <select id="selectProgram" onchange="chargerInterface()">
             <option value="" disabled selected>Choisir une Séance</option>
         </select>
@@ -138,13 +161,11 @@
         <div id="zoneFinSeance"></div>
     </div>
 
-    <div id="view-progs" class="hidden">
+    <div id="view-progs" class="app-view hidden">
         <button class="builder-btn" onclick="toggleBuilder()">Créer une Séance</button>
-        
         <div id="builderArea" class="hidden">
             <h3 style="margin-top:0">Nouvelle Séance</h3>
             <input type="text" id="newProgName" placeholder="Nom de la séance" style="margin-bottom:15px;">
-            
             <div class="builder-block">
                 <span id="labelExoA" class="builder-label hidden">Exercice A (Principal)</span>
                 <input type="text" id="buildExoName" placeholder="Nom de l'exercice" style="margin-bottom:10px;">
@@ -153,7 +174,6 @@
                     <input type="text" id="buildReps" placeholder="Reps (ex: 10-12)">
                 </div>
             </div>
-
             <div id="blockExoB" class="builder-block hidden">
                 <span class="builder-label">Exercice B (Superset)</span>
                 <input type="text" id="buildExoNameB" placeholder="Nom du 2ème exercice" style="margin-bottom:10px;">
@@ -162,7 +182,6 @@
                     <input type="text" id="buildRepsB" placeholder="Reps (ex: 10-12)">
                 </div>
             </div>
-
             <div id="builderButtons">
                 <div id="btnGroupNormal">
                     <button id="btnAddNormal" class="btn-add" onclick="ajouterExoAuBuilder()">Ajouter</button>
@@ -173,28 +192,51 @@
                     <button class="btn-cancel" onclick="annulerModeSuperset()">Annuler le Superset</button>
                 </div>
             </div>
-            
             <div id="builderListDisplay" style="margin-bottom:15px; margin-top:15px;"></div>
-            
             <button id="btnSaveProg" class="btn-primary" onclick="sauvegarderProgrammeFinal()">Sauvegarder la Séance</button>
         </div>
-
         <div id="listeMesProgrammes"></div>
     </div>
 
-    <div id="view-history" class="hidden">
+    <div id="view-history" class="app-view hidden">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
             <h3 id="histMainTitle" style="margin:0; text-transform:uppercase;">Types de Séances</h3>
             <button id="histActionBtn" class="btn-danger" onclick="resetHistoryOnly()">Effacer toutes les Séances</button>
         </div>
         <div id="listeHistorique"></div>
+        <div class="backup-area">
+            <h4 style="margin-top:0; color:#b2bec3;">GESTION DES DONNÉES</h4>
+            <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
+            <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
+            <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+        </div>
+    </div>
+
+    <div id="view-calendar" class="app-view hidden">
+        <h3 style="margin-top:0; text-transform:uppercase; text-align:center; margin-bottom:20px;">Calendrier</h3>
+        <div class="calendar-wrapper">
+            <div class="calendar-header">
+                <button class="btn-cal-nav" onclick="changeMonth(-1)">&#10094;</button>
+                <span id="calMonthDisplay" style="font-weight:800; font-size:1.1rem; text-transform:capitalize;"></span>
+                <button class="btn-cal-nav" onclick="changeMonth(1)">&#10095;</button>
+            </div>
+            <div class="calendar-weekdays">
+                <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div><div class="cal-weekday">Jeu</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sam</div><div class="cal-weekday">Dim</div>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+        <div id="calendarDetails" style="margin-top:20px;">
+            <h4 style="color:#b2bec3; font-size:0.9rem; text-transform:uppercase;">Détails du jour</h4>
+            <div id="daySessionsList" style="margin-top:10px; color:#636e72;">Cliquez sur un jour pour voir les détails.</div>
+        </div>
     </div>
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" onclick="switchTab('seance', this)">Séance</button>
-    <button class="nav-item" onclick="switchTab('progs', this)">Programme</button>
-    <button class="nav-item" onclick="switchTab('history', this)">Historique</button>
+    <button class="nav-item active" onclick="switchTab('seance', this, 0)">Séance</button>
+    <button class="nav-item" onclick="switchTab('progs', this, 1)">Programme</button>
+    <button class="nav-item" onclick="switchTab('history', this, 2)">Historique</button>
+    <button class="nav-item" onclick="switchTab('calendar', this, 3)">Calendrier</button>
 </nav>
 
 <script>
@@ -206,6 +248,8 @@
     let currentSessionLogs = [];
     let tempBuilderList = [];
     let currentEditingIndex = -1; 
+    let currentCalDate = new Date(); 
+    let currentTabIndex = 0; // Pour le tracking de la direction
     
     const allColors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#E0BBE4', '#FF9AA2', '#957DAD'];
     let colorBag = [];
@@ -223,24 +267,149 @@
         updateSelectMenu();
         renderProgramList();
         renderHistory();
+        renderCalendar();
         initSortable();
     });
 
-    // --- SORTABLE JS ---
-    function initSortable() {
-        const el = document.getElementById('builderListDisplay');
-        new Sortable(el, {
-            animation: 150,
-            ghostClass: 'sortable-ghost',
-            filter: '.delete-x',
-            delay: 200, delayOnTouchOnly: true, 
-            onEnd: function(evt) { 
-                updateBuilderOrder();
-                resetBuilderForm();
+    // --- NAVIGATION ANIMÉE V93 ---
+    function switchTab(viewName, btn, newIndex) {
+        // Ne rien faire si on clique sur l'onglet déjà actif
+        if (newIndex === currentTabIndex) return;
+
+        // Déterminer la direction
+        const direction = newIndex > currentTabIndex ? 'right' : 'left';
+        currentTabIndex = newIndex;
+
+        // Cacher toutes les vues et retirer les classes d'anim
+        const views = document.querySelectorAll('.app-view');
+        views.forEach(v => {
+            v.classList.add('hidden');
+            v.classList.remove('anim-right', 'anim-left');
+        });
+
+        // Afficher la nouvelle vue avec l'animation
+        const newView = document.getElementById('view-' + viewName);
+        newView.classList.remove('hidden');
+        newView.classList.add(direction === 'right' ? 'anim-right' : 'anim-left');
+
+        // Gérer la navbar
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Titres
+        const titleEl = document.getElementById('mainTitle');
+        if(viewName === 'seance') titleEl.innerText = "Ma Séance";
+        if(viewName === 'progs') titleEl.innerText = "Mon Programme";
+        if(viewName === 'history') titleEl.innerText = "Mon Historique";
+        if(viewName === 'calendar') { titleEl.innerText = "Mon Calendrier"; renderCalendar(); }
+    }
+
+    // --- CALENDRIER LOGIC ---
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const monthDisplay = document.getElementById('calMonthDisplay');
+        grid.innerHTML = '';
+
+        const year = currentCalDate.getFullYear();
+        const month = currentCalDate.getMonth();
+        const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        monthDisplay.innerText = `${monthNames[month]} ${year}`;
+
+        const firstDayOfMonth = new Date(year, month, 1).getDay(); 
+        let adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            const emptyCell = document.createElement('div');
+            grid.appendChild(emptyCell);
+        }
+
+        const today = new Date();
+        
+        for (let d = 1; d <= daysInMonth; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'cal-day active-month';
+            cell.innerText = d;
+
+            const cellDateObj = new Date(year, month, d);
+            const cellDateStr = cellDateObj.toLocaleDateString(); 
+
+            if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                cell.classList.add('today');
             }
+
+            const hasSession = DB.history.some(s => s.date === cellDateStr);
+            if (hasSession) {
+                cell.classList.add('has-session');
+            }
+
+            cell.onclick = () => {
+                document.querySelectorAll('.cal-day').forEach(c => c.classList.remove('selected'));
+                cell.classList.add('selected');
+                showDayDetails(cellDateStr);
+            };
+
+            grid.appendChild(cell);
+        }
+    }
+
+    function changeMonth(delta) {
+        currentCalDate.setMonth(currentCalDate.getMonth() + delta);
+        renderCalendar();
+    }
+
+    function showDayDetails(dateStr) {
+        const listDiv = document.getElementById('daySessionsList');
+        listDiv.innerHTML = '';
+        const sessions = DB.history.filter(s => s.date === dateStr);
+        if (sessions.length === 0) {
+            listDiv.innerHTML = '<div style="color:#b2bec3; font-style:italic;">Aucune séance ce jour-là.</div>';
+            return;
+        }
+        sessions.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'session-item-detail';
+            item.innerHTML = `<span>${s.programName}</span> <small style="color:#636e72">Voir Historique pour détails</small>`;
+            listDiv.appendChild(item);
         });
     }
 
+    // --- DATA EXPORT ---
+    function exportData() {
+        const dataStr = JSON.stringify(DB);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const exportFileDefaultName = 'gym_tracker_backup_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.json';
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    }
+    function triggerImport() { document.getElementById('importFile').click(); }
+    function importData(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.progs && data.history) {
+                        if(confirm("Attention : Cela va remplacer toutes vos données actuelles. Continuer ?")) {
+                            DB = data;
+                            localStorage.setItem('gym_v8_progs', JSON.stringify(DB.progs));
+                            localStorage.setItem('gym_v21_history', JSON.stringify(DB.history));
+                            alert("Données restaurées !");
+                            location.reload();
+                        }
+                    } else { alert("Fichier invalide."); }
+                } catch(err) { alert("Erreur fichier."); }
+            };
+            reader.readAsText(input.files[0]);
+        }
+    }
+
+    function initSortable() {
+        const el = document.getElementById('builderListDisplay');
+        new Sortable(el, { animation: 150, ghostClass: 'sortable-ghost', filter: '.delete-x', delay: 200, delayOnTouchOnly: true, onEnd: function(evt) { updateBuilderOrder(); resetBuilderForm(); } });
+    }
     function updateBuilderOrder() {
         const newOrder = [];
         const items = document.querySelectorAll('#builderListDisplay .builder-item');
@@ -253,18 +422,20 @@
         renderBuilder(); 
     }
 
-    // --- FONCTION RECUPERATION PERF (V84 Contextuelle) ---
-    function getLastPerf(exoName, setNum, progName) {
-        const lastSession = DB.history.find(session => 
-            session.programName === progName && 
-            session.details && session.details.some(log => log.exo === exoName)
-        );
+    function getLastPerfRaw(exoName, setNum, progName) {
+        const lastSession = DB.history.find(session => session.programName === progName && session.details && session.details.some(log => log.exo === exoName));
         if (!lastSession) return null;
         const log = lastSession.details.find(l => l.exo === exoName && l.serie === setNum);
         return log ? log.perf : null;
     }
+    function getSplitPerf(exoName, setNum, progName) {
+        const raw = getLastPerfRaw(exoName, setNum, progName);
+        if (!raw) return null;
+        let cleanRaw = raw.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ ");
+        const parts = cleanRaw.split(" + ");
+        return { main: parts[0], drop: parts[1] || null };
+    }
 
-    // --- LOGIQUE EDITION ---
     function editBuilderItem(index) {
         currentEditingIndex = index;
         const item = tempBuilderList[index];
@@ -294,8 +465,7 @@
     function ajouterExoAuBuilder() {
         const n = document.getElementById('buildExoName').value;
         let s = parseInt(document.getElementById('buildSeries').value);
-        if(s < 1 || isNaN(s)) s = 1; 
-        const r = document.getElementById('buildReps').value;
+        if(s < 1 || isNaN(s)) s = 1; const r = document.getElementById('buildReps').value;
         if(!n) return alert("Nom manquant");
         const newExo = {name:n, sets:s, reps:r, isSuperset: false};
         if (currentEditingIndex > -1) { tempBuilderList[currentEditingIndex] = newExo; } else { tempBuilderList.push(newExo); }
@@ -303,17 +473,10 @@
     }
 
     function validerSupersetBuilder() {
-        const nA = document.getElementById('buildExoName').value;
-        let sA = parseInt(document.getElementById('buildSeries').value);
-        if(sA < 1 || isNaN(sA)) sA = 1;
-        const rA = document.getElementById('buildReps').value;
-        const nB = document.getElementById('buildExoNameB').value;
-        let sB = parseInt(document.getElementById('buildSeriesB').value);
-        if(sB < 1 || isNaN(sB)) sB = 1;
-        const rB = document.getElementById('buildRepsB').value;
+        const nA = document.getElementById('buildExoName').value; let sA = parseInt(document.getElementById('buildSeries').value); if(sA < 1 || isNaN(sA)) sA = 1; const rA = document.getElementById('buildReps').value;
+        const nB = document.getElementById('buildExoNameB').value; let sB = parseInt(document.getElementById('buildSeriesB').value); if(sB < 1 || isNaN(sB)) sB = 1; const rB = document.getElementById('buildRepsB').value;
         if(!nA || !nB) return alert("Remplis les deux noms !");
-        const exoA = {name:nA, sets:sA, reps:rA, isSuperset: true};
-        const exoB = {name:nB, sets:sB, reps:rB, isSuperset: true};
+        const exoA = {name:nA, sets:sA, reps:rA, isSuperset: true}; const exoB = {name:nB, sets:sB, reps:rB, isSuperset: true};
         if (currentEditingIndex > -1) { tempBuilderList[currentEditingIndex] = exoA; tempBuilderList[currentEditingIndex+1] = exoB; } else { tempBuilderList.push(exoA); tempBuilderList.push(exoB); }
         resetBuilderForm(); renderBuilder(); document.getElementById('buildExoName').value = ''; document.getElementById('buildExoNameB').value = ''; annulerModeSuperset(); document.getElementById('buildExoName').focus();
     }
@@ -329,8 +492,7 @@
         const listDiv = document.getElementById('builderListDisplay'); listDiv.innerHTML = ''; 
         for (let i = 0; i < tempBuilderList.length; i++) { 
             const item = tempBuilderList[i]; 
-            let editingClass = '';
-            if (currentEditingIndex !== -1) { if (i === currentEditingIndex || (item.isSuperset && i === currentEditingIndex + 1)) { editingClass = 'editing-active'; } }
+            let editingClass = ''; if (currentEditingIndex !== -1) { if (i === currentEditingIndex || (item.isSuperset && i === currentEditingIndex + 1)) { editingClass = 'editing-active'; } }
             if (item.isSuperset && tempBuilderList[i+1] && tempBuilderList[i+1].isSuperset) { 
                 const nextItem = tempBuilderList[i+1]; const dataJson = JSON.stringify({ type: 'superset', dataA: item, dataB: nextItem });
                 listDiv.innerHTML += `<div class="builder-item builder-item-superset ${editingClass}" data-json='${dataJson}'><span class="delete-x" onclick="tempBuilderList.splice(${i}, 2); resetBuilderForm(); renderBuilder()">✖</span><div class="builder-click-zone" onclick="editBuilderItem(${i})" title="Cliquer pour modifier"><div style="margin-bottom:12px;"> <span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span> </div><div> <span class="builder-exo-name">${nextItem.name}</span> <span class="builder-exo-info">${nextItem.sets} x ${nextItem.reps} reps</span> </div></div></div>`; i++; 
@@ -355,15 +517,12 @@
         if(name && tempBuilderList.length > 0) { DB.progs[name] = tempBuilderList; localStorage.setItem('gym_v8_progs', JSON.stringify(DB.progs)); resetBuilderForm(); tempBuilderList = []; document.getElementById('newProgName').value = ''; renderBuilder(); updateSelectMenu(); renderProgramList(); toggleBuilder(); } 
     }
 
-    // --- LE RESTE EST INCHANGÉ ---
     function deleteProg(name, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete DB.progs[name]; localStorage.setItem('gym_v8_progs', JSON.stringify(DB.progs)); updateSelectMenu(); renderProgramList(); chargerInterface(); } }
     function updateSelectMenu() { const s = document.getElementById('selectProgram'); s.innerHTML = '<option value="" disabled selected>Choisir une Séance</option>'; Object.keys(DB.progs).forEach(k => s.innerHTML += `<option value="${k}">${k}</option>`); }
     function renderProgramList() { const div = document.getElementById('listeMesProgrammes'); div.innerHTML = ''; colorBag = [...allColors]; Object.keys(DB.progs).forEach(k => { let html = ` <div class="prog-item" onclick="toggleDetails('${k}')"> <span class="prog-title">${k}</span> <div class="prog-header-actions"><button class="btn-edit" data-name="${k}" onclick="startEditProgram(this, event)">Modifier</button><button class="btn-danger" onclick="deleteProg('${k.replace(/'/g, "\\'")}', event)">Supprimer</button></div> </div> <div id="details-${k}" class="prog-details-box">`; const exos = DB.progs[k]; for (let i = 0; i < exos.length; i++) { const e = exos[i]; if (e.isSuperset && exos[i+1] && exos[i+1].isSuperset) { const eNext = exos[i+1]; const duoColor = getNextColor(); html += `<div class="superset-wrapper" style="background: ${duoColor}20; border: 1px solid ${duoColor}50;">`; html += ` <div class="prog-line" style="border-left-color: ${duoColor}; border-bottom: none; padding-bottom: 5px;"> <span class="prog-line-name">${e.name}</span> <span class="prog-line-info">${e.sets} x ${e.reps} reps</span> </div>`; html += ` <div class="prog-line" style="border-left-color: ${duoColor}; padding-top: 5px;"> <span class="prog-line-name">${eNext.name}</span> <span class="prog-line-info">${eNext.sets} x ${eNext.reps} reps</span> </div>`; html += `</div>`; i++; } else { const soloColor = getNextColor(); html += `<div class="exo-wrapper" style="background: ${soloColor}20; border: 1px solid ${soloColor}50;"> <div class="prog-line" style="border-left-color: ${soloColor}"> <span class="prog-line-name">${e.name}</span> <span class="prog-line-info">${e.sets} x ${e.reps} reps</span> </div> </div>`; } } html += `</div>`; div.innerHTML += html; }); }
     function toggleDetails(id) { document.getElementById('details-'+id).classList.toggle('open'); }
-    function switchTab(view, btn) { ['seance', 'progs', 'history'].forEach(v => document.getElementById('view-'+v).classList.add('hidden')); document.getElementById('view-'+view).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); const titleEl = document.getElementById('mainTitle'); if(view === 'seance') titleEl.innerText = "Ma Séance"; if(view === 'progs') titleEl.innerText = "Mon Programme"; if(view === 'history') titleEl.innerText = "Mon Historique"; }
     function toggleBuilder() { const area = document.getElementById('builderArea'); if (!area.classList.contains('hidden')) { resetBuilderForm(); document.getElementById('newProgName').value = ''; tempBuilderList = []; renderBuilder(); document.getElementById('btnSaveProg').innerText = "Sauvegarder la Séance"; } area.classList.toggle('hidden'); }
     
-    // --- INTEGRATION V86 : AFFICHAGE COMPACT ---
     function chargerInterface() { 
         const key = document.getElementById('selectProgram').value; const zone = document.getElementById('zoneTravail'); const btnZone = document.getElementById('zoneFinSeance'); zone.innerHTML = ''; btnZone.innerHTML = ''; currentSessionLogs = []; 
         if (!key) return; const exos = DB.progs[key]; colorBag = [...allColors]; 
@@ -378,43 +537,42 @@
     function createInputWithUnit(id, unit) { return `<div class="input-wrapper"><input type="number" id="${id}" placeholder="" min="0" oninput="this.value = Math.abs(this.value)"><span class="unit-label">${unit}</span></div>`; }
     function createDropInput(className, unit) { return `<div class="input-wrapper"><input type="number" class="${className}" placeholder="" min="0" oninput="this.value = Math.abs(this.value)"><span class="unit-label">${unit}</span></div>`; }
     
-    // --- RENDER NORMAL AVEC NETTOYAGE V86 ---
     function renderNormal(container, exo, idx, color, progName) { 
         let html = `<div class="card" style="--card-color: ${color}; border-left-color: ${color}; animation-delay: ${idx * 0.1}s"><div class="card-header"><div class="header-top"><span class="exo-title">${exo.name}</span><span class="exo-badge">Fourchette de reps : ${exo.reps}</span></div></div><div id="sets_${idx}">`; 
         for(let s=1; s<=exo.sets; s++) { 
-            let lastPerf = getLastPerf(exo.name, s, progName);
-            // NETTOYAGE V86 : Remplacer "Dégressive:" par "+" et s'assurer que l'affichage est compact
-            if (lastPerf) {
-                lastPerf = lastPerf.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ ");
-                lastPerf = `<span class="last-perf">Précédent : ${lastPerf}</span>`;
-            } else { lastPerf = ''; }
-
-            html += `<div class="serie-container" id="container_${idx}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">#${s}</div><button class="btn-mini-add" onclick="ajouterDegressive('${idx}_${s}')">+</button></div>${createInputWithUnit(`p_${idx}_${s}`, 'kg')}${createInputWithUnit(`r_${idx}_${s}`, 'reps')}</div>${lastPerf}</div>`; 
+            const data = getSplitPerf(exo.name, s, progName);
+            const mainPerfHTML = (data && data.main) ? `<span class="last-perf">Précédent : ${data.main}</span>` : '';
+            const safeExoName = exo.name.replace(/'/g, "\\'"); const safeProgName = progName.replace(/'/g, "\\'");
+            html += `<div class="serie-container" id="container_${idx}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">#${s}</div><button class="btn-mini-add" onclick="ajouterDegressive('${idx}_${s}', '${safeExoName}', '${safeProgName}', ${s})">+</button></div>${createInputWithUnit(`p_${idx}_${s}`, 'kg')}${createInputWithUnit(`r_${idx}_${s}`, 'reps')}</div>${mainPerfHTML}</div>`; 
         } 
         html += `</div><button class="btn-finish-exo" id="btn_finish_${idx}" onclick="validerExerciceNormal('${exo.name}', ${idx}, ${exo.sets}, this, '${color}')">Exercice Fini</button></div>`; 
         container.innerHTML += html; 
     }
     
-    // --- RENDER SUPERSET AVEC NETTOYAGE V86 ---
     function renderSuperset(container, exoA, idxA, exoB, idxB, color, progName) { 
         const max = Math.max(exoA.sets, exoB.sets); 
+        const safeProgName = progName.replace(/'/g, "\\'"); const safeExoNameA = exoA.name.replace(/'/g, "\\'"); const safeExoNameB = exoB.name.replace(/'/g, "\\'");
         let html = `<div class="card superset-container" style="--card-color: ${color}; border-left-color: ${color}; animation-delay: ${idxA * 0.1}s"><span class="superset-label" style="background:${color}">Superset</span><div class="card-header" style="border:none; padding-bottom:5px; margin-bottom:5px;"><div class="header-top"><span class="exo-title">A. ${exoA.name}</span> <span class="exo-badge">Fourchette de reps : ${exoA.reps}</span></div></div><div class="card-header"><div class="header-top"><span class="exo-title">B. ${exoB.name}</span> <span class="exo-badge">Fourchette de reps : ${exoB.reps}</span></div></div><div id="sets_super_${idxA}">`; 
         for(let s=1; s<=max; s++) { 
-            let lastPerfA = getLastPerf(exoA.name, s, progName);
-            if(lastPerfA) { lastPerfA = lastPerfA.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ "); lastPerfA = `<span class="last-perf">Précédent : ${lastPerfA}</span>`; } else { lastPerfA = ''; }
-            
-            let lastPerfB = getLastPerf(exoB.name, s, progName);
-            if(lastPerfB) { lastPerfB = lastPerfB.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ "); lastPerfB = `<span class="last-perf">Précédent : ${lastPerfB}</span>`; } else { lastPerfB = ''; }
-
-            html += `<div class="set-block"><div class="serie-container" id="container_${idxA}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">A</div><button class="btn-mini-add" onclick="ajouterDegressive('${idxA}_${s}')">+</button></div>${createInputWithUnit(`p_${idxA}_${s}`, 'kg')}${createInputWithUnit(`r_${idxA}_${s}`, 'reps')}</div>${lastPerfA}</div><div class="serie-container" id="container_${idxB}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">B</div><button class="btn-mini-add" onclick="ajouterDegressive('${idxB}_${s}')">+</button></div>${createInputWithUnit(`p_${idxB}_${s}`, 'kg')}${createInputWithUnit(`r_${idxB}_${s}`, 'reps')}</div>${lastPerfB}</div></div>`; 
+            const dataA = getSplitPerf(exoA.name, s, progName); const mainPerfHTMLA = (dataA && dataA.main) ? `<span class="last-perf">Précédent : ${dataA.main}</span>` : '';
+            const dataB = getSplitPerf(exoB.name, s, progName); const mainPerfHTMLB = (dataB && dataB.main) ? `<span class="last-perf">Précédent : ${dataB.main}</span>` : '';
+            html += `<div class="set-block"><div class="serie-container" id="container_${idxA}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">A</div><button class="btn-mini-add" onclick="ajouterDegressive('${idxA}_${s}', '${safeExoNameA}', '${safeProgName}', ${s})">+</button></div>${createInputWithUnit(`p_${idxA}_${s}`, 'kg')}${createInputWithUnit(`r_${idxA}_${s}`, 'reps')}</div>${mainPerfHTMLA}</div><div class="serie-container" id="container_${idxB}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">B</div><button class="btn-mini-add" onclick="ajouterDegressive('${idxB}_${s}', '${safeExoNameB}', '${safeProgName}', ${s})">+</button></div>${createInputWithUnit(`p_${idxB}_${s}`, 'kg')}${createInputWithUnit(`r_${idxB}_${s}`, 'reps')}</div>${mainPerfHTMLB}</div></div>`; 
         } 
         html += `</div><button class="btn-finish-exo" id="btn_finish_${idxA}" onclick="validerSuperset('${exoA.name}', ${idxA}, '${exoB.name}', ${idxB}, ${max}, this, '${color}')">Exercices Finis</button></div>`; 
         container.innerHTML += html; 
     }
     
-    function ajouterDegressive(baseId) { const container = document.getElementById('container_' + baseId); const div = document.createElement('div'); div.className = 'input-row drop-row'; div.innerHTML = `<div class="set-col"><div class="drop-icon" onclick="this.closest('.drop-row').remove()" title="Supprimer">↳</div></div>${createDropInput('drop-weight', 'kg')}${createDropInput('drop-reps', 'reps')}`; container.appendChild(div); }
-    
-    // --- SAUVEGARDE COMPACTE V86 (" + ") ---
+    function ajouterDegressive(baseId, exoName, progName, setNum) { 
+        const container = document.getElementById('container_' + baseId); 
+        const div = document.createElement('div'); div.className = 'input-row drop-row'; 
+        const data = getSplitPerf(exoName, setNum, progName);
+        const dropHint = (data && data.drop) ? `<span class="last-perf" style="margin-left:45px;">Précédent : ${data.drop}</span>` : '';
+        div.innerHTML = `<div class="set-col"><div class="drop-icon" onclick="this.closest('.drop-row').remove()" title="Supprimer">↳</div></div>${createDropInput('drop-weight', 'kg')}${createDropInput('drop-reps', 'reps')}`; 
+        div.style.flexWrap = "wrap";
+        if(dropHint) div.innerHTML += `<div style="width:100%;">${dropHint}</div>`;
+        container.appendChild(div); 
+    }
+
     function getDropsString(containerId) { const container = document.getElementById(containerId); let drops = []; container.querySelectorAll('.drop-row').forEach(row => { const w = row.querySelector('.drop-weight').value; const r = row.querySelector('.drop-reps').value; if(w && r) drops.push(`${w} kg x ${r} reps`); }); if(drops.length > 0) return " + " + drops.join(' + '); return ""; }
     
     function validerExerciceNormal(nomExo, idx, totalSets, btn, color) { if (btn.classList.contains('validated')) { btn.classList.remove('validated'); btn.innerText = "Exercice Fini"; btn.style.backgroundColor = "var(--btn-default-bg)"; btn.style.color = "var(--btn-default-text)"; btn.style.boxShadow = "none"; for(let s=1; s<=totalSets; s++) { document.getElementById(`p_${idx}_${s}`).disabled = false; document.getElementById(`r_${idx}_${s}`).disabled = false; const container = document.getElementById(`container_${idx}_${s}`); container.querySelectorAll('input').forEach(i => i.disabled = false); if(container.querySelector('.btn-mini-add')) container.querySelector('.btn-mini-add').style.display = 'flex'; container.querySelectorAll('.drop-icon').forEach(icon => icon.style.display = 'block'); } currentSessionLogs = currentSessionLogs.filter(log => log.exo !== nomExo); return; } let savedCount = 0; let tempLogs = []; for(let s=1; s<=totalSets; s++) { const p = document.getElementById(`p_${idx}_${s}`).value; const r = document.getElementById(`r_${idx}_${s}`).value; if(p && r) { let dropText = getDropsString(`container_${idx}_${s}`); tempLogs.push({ exo: nomExo, perf: `${p} kg x ${r} reps${dropText}`, serie: s }); savedCount++; } } if(savedCount > 0) { currentSessionLogs.push(...tempLogs); btn.classList.add('validated'); btn.innerText = "Validé"; btn.style.backgroundColor = color; btn.style.color = "#fff"; for(let s=1; s<=totalSets; s++) { document.getElementById(`p_${idx}_${s}`).disabled = true; document.getElementById(`r_${idx}_${s}`).disabled = true; const container = document.getElementById(`container_${idx}_${s}`); container.querySelectorAll('input').forEach(i => i.disabled = true); if(container.querySelector('.btn-mini-add')) container.querySelector('.btn-mini-add').style.display = 'none'; container.querySelectorAll('.drop-icon').forEach(icon => icon.style.display = 'none'); } } else { alert("Remplis au moins une série !"); } }
@@ -427,30 +585,47 @@
         const titleEl = document.getElementById('histMainTitle'); 
         const btnEl = document.getElementById('histActionBtn'); 
         container.innerHTML = ''; 
-        if(DB.history.length === 0) { container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée.</p>'; return; } 
-        
+        if(DB.history.length === 0) { 
+            titleEl.innerText = "Types de Séances"; 
+            btnEl.innerText = "Effacer toutes les Séances"; 
+            btnEl.onclick = resetHistoryOnly;
+            container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée.</p>'; 
+            historyState.view = 'categories';
+            historyState.selected = null;
+            return; 
+        } 
         if (historyState.view === 'categories') { 
             titleEl.innerText = "Types de Séances"; 
             btnEl.innerText = "Effacer toutes les Séances"; 
             btnEl.onclick = resetHistoryOnly; 
             const groups = {}; DB.history.forEach(s => { if(!groups[s.programName]) groups[s.programName] = 0; groups[s.programName]++; }); 
-            Object.keys(groups).forEach(name => { const count = groups[name]; const btn = document.createElement('div'); btn.className = 'hist-category-btn'; btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; container.appendChild(btn); }); 
+            Object.keys(groups).forEach(name => { 
+                const count = groups[name]; 
+                const btn = document.createElement('div'); btn.className = 'hist-category-btn'; 
+                btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; 
+                btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; 
+                container.appendChild(btn); 
+            }); 
         } else { 
             titleEl.innerText = "SÉANCES " + historyState.selected; 
             btnEl.innerText = "Effacer les Séances " + historyState.selected; 
             btnEl.onclick = () => deleteCategoryHistory(historyState.selected); 
-            const backBtn = document.createElement('div'); backBtn.className = 'btn-back-hist'; backBtn.innerText = 'Retour aux types de Séances'; backBtn.onclick = () => { historyState.view = 'categories'; historyState.selected = null; renderHistory(); }; container.appendChild(backBtn); 
+            const backBtn = document.createElement('div'); backBtn.className = 'btn-back-hist'; 
+            backBtn.innerText = 'Retour aux types de Séances'; 
+            backBtn.onclick = () => { historyState.view = 'categories'; historyState.selected = null; renderHistory(); }; 
+            container.appendChild(backBtn); 
             const filtered = DB.history.filter(s => s.programName === historyState.selected); 
-            filtered.forEach(session => { const wrapper = document.createElement('div'); wrapper.className = 'hist-session'; const header = document.createElement('div'); header.className = 'hist-header'; header.innerHTML = `<span class="hist-date-large">${session.date}</span>`; const body = document.createElement('div'); body.className = 'hist-body'; 
-                // AFFICHAGE HISTORIQUE AVEC LE NETTOYAGE V86 EGALEMENT
-                if(session.details && session.details.length > 0) { 
-                    session.details.forEach(log => { 
-                        // Nettoyage visuel de l'historique aussi
-                        let cleanPerf = log.perf.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ ");
-                        body.innerHTML += `<div class="hist-exo-line"><span class="hist-exo-name">${log.exo} <small style="color:#b2bec3;">(#${log.serie})</small></span><span class="hist-exo-perf">${cleanPerf}</span></div>`; 
-                    }); 
-                } else { body.innerHTML = '<div style="padding:10px; color:#999">Pas de détails.</div>'; } 
-                header.onclick = () => { body.classList.toggle('open'); }; wrapper.appendChild(header); wrapper.appendChild(body); container.appendChild(wrapper); 
+            filtered.forEach(session => { 
+                const wrapper = document.createElement('div'); wrapper.className = 'hist-session'; 
+                const header = document.createElement('div'); header.className = 'hist-header'; header.innerHTML = `<span class="hist-date-large">${session.date}</span>`; 
+                const body = document.createElement('div'); body.className = 'hist-body'; 
+                if(session.details && session.details.length > 0) { session.details.forEach(log => { 
+                    let cleanPerf = log.perf.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ ");
+                    body.innerHTML += `<div class="hist-exo-line"><span class="hist-exo-name">${log.exo} <small style="color:#b2bec3;">(#${log.serie})</small></span><span class="hist-exo-perf">${cleanPerf}</span></div>`; 
+                }); } 
+                else { body.innerHTML = '<div style="padding:10px; color:#999">Pas de détails.</div>'; } 
+                header.onclick = () => { body.classList.toggle('open'); }; 
+                wrapper.appendChild(header); wrapper.appendChild(body); container.appendChild(wrapper); 
             }); 
         } 
     }
@@ -462,5 +637,4 @@
 </script>
 
 </body>
-
 </html>
