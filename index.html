@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V102 Fluid</title>
+    <title>Gym Tracker V103 Touch Fix</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <link rel="manifest" href="manifest.json">
@@ -149,8 +149,8 @@
             font-size: 1.1rem; font-weight: 800; z-index: 1000;
             text-shadow: 0 1px 1px rgba(255,255,255,0.5);
             
-            /* IMPORTANT: Only transition visuals, not position */
-            transition: background 0.3s, box-shadow 0.3s, color 0.3s, transform 0.2s;
+            /* FIX LAG: Removed property transitions to avoid fighting with JS */
+            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
             touch-action: none;
         }
 
@@ -337,6 +337,7 @@
         history: JSON.parse(localStorage.getItem('gym_v21_history')) || []
     };
     
+    // PRESETS STORAGE
     let timerPresets = JSON.parse(localStorage.getItem('gym_timer_presets')) || [60, 90, 120, 180];
     let isEditingPresets = false;
 
@@ -351,10 +352,10 @@
     let lastDuration = 90; 
     let isTimerRunning = false;
 
+    // DRAG VARIABLES (V103 Logic)
     const floatBtn = document.getElementById('floatingTimerBtn');
     let isDragging = false;
-    let hasMoved = false;
-    let offsetX, offsetY;
+    let startX, startY;
 
     const allColors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#E0BBE4', '#FF9AA2', '#957DAD'];
     let colorBag = [];
@@ -374,12 +375,12 @@
         renderHistory();
         renderCalendar();
         initSortable();
-        updateTimerDisplay();
+        updateTimerDisplay(); // V101: Will set initial text on float button
         initDrag();
         renderPresets(); 
     });
 
-    // --- V100 PRESETS LOGIC ---
+    // --- V100 PRESETS LOGIC (CLEAN) ---
     function renderPresets() {
         const container = document.getElementById('presetContainer');
         container.innerHTML = '';
@@ -433,45 +434,89 @@
         renderPresets();
     }
 
-    // --- DRAG LOGIC (V102 FIX) ---
+    // --- DRAG LOGIC (V103 FIX) ---
     function initDrag() {
         floatBtn.addEventListener('touchstart', (e) => {
-            isDragging = false; hasMoved = false;
             const touch = e.touches[0];
             const rect = floatBtn.getBoundingClientRect();
-            offsetX = touch.clientX - rect.left; offsetY = touch.clientY - rect.top;
+            // Store offset from top-left of button
+            startX = touch.clientX - rect.left;
+            startY = touch.clientY - rect.top;
+            
+            // Record original click position to detect "tap" vs "drag"
+            floatBtn.setAttribute('data-start-x', touch.clientX);
+            floatBtn.setAttribute('data-start-y', touch.clientY);
         }, {passive: false});
 
         floatBtn.addEventListener('touchmove', (e) => {
-            hasMoved = true; isDragging = true; e.preventDefault();
+            e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
-            let x = touch.clientX - offsetX; let y = touch.clientY - offsetY;
-            const maxX = window.innerWidth - floatBtn.offsetWidth; const maxY = window.innerHeight - floatBtn.offsetHeight;
-            if(x < 0) x = 0; if(x > maxX) x = maxX; if(y < 0) y = 0; if(y > maxY) y = maxY;
-            floatBtn.style.left = x + 'px'; floatBtn.style.top = y + 'px';
-            floatBtn.style.right = 'auto'; floatBtn.style.bottom = 'auto';
+            
+            // Move Element
+            let x = touch.clientX - startX;
+            let y = touch.clientY - startY;
+            
+            // Boundaries
+            const maxX = window.innerWidth - floatBtn.offsetWidth;
+            const maxY = window.innerHeight - floatBtn.offsetHeight;
+            if(x < 0) x = 0; if(x > maxX) x = maxX;
+            if(y < 0) y = 0; if(y > maxY) y = maxY;
+            
+            floatBtn.style.left = x + 'px';
+            floatBtn.style.top = y + 'px';
+            floatBtn.style.right = 'auto';
+            floatBtn.style.bottom = 'auto';
         }, {passive: false});
 
-        floatBtn.addEventListener('touchend', (e) => { if(!hasMoved) { toggleTimerPanel(); } isDragging = false; });
+        floatBtn.addEventListener('touchend', (e) => {
+            const touch = e.changedTouches[0];
+            const originalX = parseFloat(floatBtn.getAttribute('data-start-x'));
+            const originalY = parseFloat(floatBtn.getAttribute('data-start-y'));
+            
+            // Calculate distance moved
+            const dist = Math.hypot(touch.clientX - originalX, touch.clientY - originalY);
+            
+            // If moved less than 10px, treat as click
+            if (dist < 10) {
+                toggleTimerPanel();
+            }
+        });
 
+        // Mouse Support (Desktop)
         floatBtn.addEventListener('mousedown', (e) => {
-            isDragging = true; hasMoved = false;
+            isDragging = true;
             const rect = floatBtn.getBoundingClientRect();
-            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            floatBtn.setAttribute('data-start-x', e.clientX);
+            floatBtn.setAttribute('data-start-y', e.clientY);
         });
 
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
-                hasMoved = true; e.preventDefault();
-                let x = e.clientX - offsetX; let y = e.clientY - offsetY;
-                const maxX = window.innerWidth - floatBtn.offsetWidth; const maxY = window.innerHeight - floatBtn.offsetHeight;
-                if(x < 0) x = 0; if(x > maxX) x = maxX; if(y < 0) y = 0; if(y > maxY) y = maxY;
-                floatBtn.style.left = x + 'px'; floatBtn.style.top = y + 'px';
-                floatBtn.style.right = 'auto'; floatBtn.style.bottom = 'auto';
+                e.preventDefault();
+                let x = e.clientX - startX;
+                let y = e.clientY - startY;
+                const maxX = window.innerWidth - floatBtn.offsetWidth;
+                const maxY = window.innerHeight - floatBtn.offsetHeight;
+                if(x < 0) x = 0; if(x > maxX) x = maxX;
+                if(y < 0) y = 0; if(y > maxY) y = maxY;
+                floatBtn.style.left = x + 'px';
+                floatBtn.style.top = y + 'px';
+                floatBtn.style.right = 'auto';
+                floatBtn.style.bottom = 'auto';
             }
         });
 
-        document.addEventListener('mouseup', () => { if(isDragging && !hasMoved) { toggleTimerPanel(); } isDragging = false; });
+        document.addEventListener('mouseup', (e) => {
+            if (isDragging) {
+                const originalX = parseFloat(floatBtn.getAttribute('data-start-x'));
+                const originalY = parseFloat(floatBtn.getAttribute('data-start-y'));
+                const dist = Math.hypot(e.clientX - originalX, e.clientY - originalY);
+                if (dist < 5) toggleTimerPanel();
+                isDragging = false;
+            }
+        });
     }
 
     // --- TIMER LOGIC ---
@@ -877,12 +922,10 @@
         
         let savedCount = 0; let tempLogs = []; 
         for(let s=1; s<=totalSets; s++) { 
-            // Save A if exists
             if(document.getElementById(`p_${idxA}_${s}`)) {
                 const pA = document.getElementById(`p_${idxA}_${s}`).value; const rA = document.getElementById(`r_${idxA}_${s}`).value; 
                 if(pA && rA) { let dropTextA = getDropsString(`container_${idxA}_${s}`); tempLogs.push({ exo: nomA, perf: `${pA} kg x ${rA} reps${dropTextA}`, serie: s }); savedCount++; } 
             }
-            // Save B if exists
             if(document.getElementById(`p_${idxB}_${s}`)) {
                 const pB = document.getElementById(`p_${idxB}_${s}`).value; const rB = document.getElementById(`r_${idxB}_${s}`).value; 
                 if(pB && rB) { let dropTextB = getDropsString(`container_${idxB}_${s}`); tempLogs.push({ exo: nomB, perf: `${pB} kg x ${rB} reps${dropTextB}`, serie: s }); savedCount++; } 
