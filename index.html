@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V103 Touch Fix</title>
+    <title>Gym Tracker V104 Touch Fix</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <link rel="manifest" href="manifest.json">
@@ -16,7 +16,7 @@
         
         /* GENERAL & RESET */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 120px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; overflow-x: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 120px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; overflow-x: hidden; user-select: none; /* Global selection off for better app feel */ }
         h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; font-size: 1.4rem; letter-spacing: -0.5px; animation: fadeInDown 0.5s ease; }
         
         .container { max-width: 600px; margin: 0 auto; position: relative; }
@@ -36,7 +36,7 @@
         select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); -webkit-appearance: none; appearance: none; cursor: pointer; transition: transform 0.1s; }
         select:active { transform: scale(0.98); }
         .input-wrapper { position: relative; flex: 1; min-width: 0; }
-        input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; }
+        input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; user-select: text; /* Allow text selection in inputs */ }
         input:focus { outline: none; background: #fff; border-color: #dfe6e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .unit-label { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 700; color: #b2bec3; pointer-events: none; }
 
@@ -149,9 +149,9 @@
             font-size: 1.1rem; font-weight: 800; z-index: 1000;
             text-shadow: 0 1px 1px rgba(255,255,255,0.5);
             
-            /* FIX LAG: Removed property transitions to avoid fighting with JS */
-            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
-            touch-action: none;
+            /* IMPORTANT: Only transition visuals, not position */
+            transition: background 0.3s, box-shadow 0.3s, color 0.3s, transform 0.2s;
+            touch-action: none; user-select: none; -webkit-user-select: none;
         }
 
         #floatingTimerBtn.active {
@@ -302,7 +302,7 @@
 </div>
 
 <div id="overlayBackdrop" class="overlay-backdrop" onclick="toggleTimerPanel()"></div>
-<button id="floatingTimerBtn">01:30</button>
+<button id="floatingTimerBtn" oncontextmenu="event.preventDefault(); return false;">01:30</button>
 <div id="timerPanel">
     <div style="width:40px; height:4px; background:#e9ecef; border-radius:2px; margin:0 auto 20px auto;"></div>
     <div class="timer-display" id="timerDisplay">01:30</div>
@@ -352,10 +352,11 @@
     let lastDuration = 90; 
     let isTimerRunning = false;
 
-    // DRAG VARIABLES (V103 Logic)
+    // DRAG VARIABLES (V104)
     const floatBtn = document.getElementById('floatingTimerBtn');
     let isDragging = false;
     let startX, startY;
+    let dragStartTime = 0;
 
     const allColors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#E0BBE4', '#FF9AA2', '#957DAD'];
     let colorBag = [];
@@ -380,7 +381,7 @@
         renderPresets(); 
     });
 
-    // --- V100 PRESETS LOGIC (CLEAN) ---
+    // --- V100 PRESETS LOGIC ---
     function renderPresets() {
         const container = document.getElementById('presetContainer');
         container.innerHTML = '';
@@ -434,55 +435,64 @@
         renderPresets();
     }
 
-    // --- DRAG LOGIC (V103 FIX) ---
+    // --- DRAG LOGIC (V104 FIX) ---
     function initDrag() {
         floatBtn.addEventListener('touchstart', (e) => {
             const touch = e.touches[0];
             const rect = floatBtn.getBoundingClientRect();
-            // Store offset from top-left of button
+            
+            isDragging = false; 
+            dragStartTime = new Date().getTime(); // Record time
+            
             startX = touch.clientX - rect.left;
             startY = touch.clientY - rect.top;
             
-            // Record original click position to detect "tap" vs "drag"
+            // Record original click position
             floatBtn.setAttribute('data-start-x', touch.clientX);
             floatBtn.setAttribute('data-start-y', touch.clientY);
         }, {passive: false});
 
         floatBtn.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Prevent scrolling
+            e.preventDefault(); 
             const touch = e.touches[0];
             
-            // Move Element
-            let x = touch.clientX - startX;
-            let y = touch.clientY - startY;
+            // Only consider it a drag if moved > 5px (debounce)
+            const originalX = parseFloat(floatBtn.getAttribute('data-start-x'));
+            const originalY = parseFloat(floatBtn.getAttribute('data-start-y'));
+            const dist = Math.hypot(touch.clientX - originalX, touch.clientY - originalY);
             
-            // Boundaries
-            const maxX = window.innerWidth - floatBtn.offsetWidth;
-            const maxY = window.innerHeight - floatBtn.offsetHeight;
-            if(x < 0) x = 0; if(x > maxX) x = maxX;
-            if(y < 0) y = 0; if(y > maxY) y = maxY;
-            
-            floatBtn.style.left = x + 'px';
-            floatBtn.style.top = y + 'px';
-            floatBtn.style.right = 'auto';
-            floatBtn.style.bottom = 'auto';
+            if (dist > 5) {
+                isDragging = true;
+                let x = touch.clientX - startX;
+                let y = touch.clientY - startY;
+                
+                const maxX = window.innerWidth - floatBtn.offsetWidth;
+                const maxY = window.innerHeight - floatBtn.offsetHeight;
+                
+                if(x < 0) x = 0; if(x > maxX) x = maxX;
+                if(y < 0) y = 0; if(y > maxY) y = maxY;
+                
+                floatBtn.style.left = x + 'px';
+                floatBtn.style.top = y + 'px';
+                floatBtn.style.right = 'auto';
+                floatBtn.style.bottom = 'auto';
+            }
         }, {passive: false});
 
         floatBtn.addEventListener('touchend', (e) => {
-            const touch = e.changedTouches[0];
-            const originalX = parseFloat(floatBtn.getAttribute('data-start-x'));
-            const originalY = parseFloat(floatBtn.getAttribute('data-start-y'));
+            // Check time duration of touch
+            const touchDuration = new Date().getTime() - dragStartTime;
             
-            // Calculate distance moved
-            const dist = Math.hypot(touch.clientX - originalX, touch.clientY - originalY);
-            
-            // If moved less than 10px, treat as click
-            if (dist < 10) {
+            // If it wasn't a drag AND touch was quick (< 300ms) = Tap
+            if (!isDragging && touchDuration < 300) {
                 toggleTimerPanel();
             }
+            
+            // Reset flags
+            isDragging = false;
         });
 
-        // Mouse Support (Desktop)
+        // Mouse Support
         floatBtn.addEventListener('mousedown', (e) => {
             isDragging = true;
             const rect = floatBtn.getBoundingClientRect();
