@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V105 Stable Touch</title>
+    <title>Gym Tracker V106 Perfect Touch</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <link rel="manifest" href="manifest.json">
@@ -132,12 +132,11 @@
         .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
         .nav-item.active { color: var(--text-main); transform: scale(1.1); }
 
-        /* --- V102 FIXED DRAGGABLE TIMER STYLES --- */
+        /* --- V106 FIXED TIMER STYLES --- */
         #floatingTimerBtn {
             position: fixed; bottom: 100px; right: 20px;
             width: auto; padding: 12px 20px; height: auto; border-radius: 30px;
-            
-            /* GLASS EFFECT */
+            /* LIQUID GLASS */
             background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(25px) saturate(150%);
             -webkit-backdrop-filter: blur(25px) saturate(150%);
@@ -149,9 +148,14 @@
             font-size: 1.1rem; font-weight: 800; z-index: 1000;
             text-shadow: 0 1px 1px rgba(255,255,255,0.5);
             
-            /* V102: No transition on pos to avoid lag */
-            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+            /* Pas de transition sur left/top pour éviter le lag */
+            transition: background 0.2s, transform 0.1s;
             touch-action: none; user-select: none; -webkit-user-select: none;
+            cursor: pointer;
+        }
+
+        #floatingTimerBtn:active {
+            transform: scale(0.95);
         }
 
         #floatingTimerBtn.active {
@@ -180,18 +184,17 @@
         .timer-btn-round.play { background: rgba(45, 52, 54, 0.8); backdrop-filter: blur(5px); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .timer-btn-round.reset { background: #ffeaa7; color: #d35400; font-size: 1.1rem; }
 
-        /* V100 CUSTOM PRESETS STYLES */
+        /* V106 CUSTOM PRESETS STYLES (Balanced Icons) */
         .timer-presets-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .timer-presets-header span { font-size: 0.85rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; }
         
-        /* Boutons Actions (Fix V102) */
-        .btn-icon-action { width: 32px; height: 32px; border-radius: 50%; border:none; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1rem; cursor:pointer; transition:0.2s; }
+        .btn-icon-action { width: 32px; height: 32px; border-radius: 50%; border:none; display:flex; align-items:center; justify-content:center; font-weight:900; cursor:pointer; transition:0.2s; }
         
-        #btnEditPresets { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); font-size: 0.9rem; } /* Croix */
+        #btnEditPresets { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); font-size: 1rem; }
         #btnEditPresets.active { background: #ff6b6b; color: white; box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3); }
         
-        /* Ajustement taille font pour le + pour matcher la croix visuellement */
-        #btnAddPreset { color: #00b894; background: rgba(0, 184, 148, 0.1); font-size: 1.2rem; } /* Plus gros */
+        /* Ajustement taille font pour le + pour qu'il paraisse aussi gros que la croix */
+        #btnAddPreset { color: #00b894; background: rgba(0, 184, 148, 0.1); font-size: 1.4rem; line-height: 1; padding-bottom: 2px; }
         #btnAddPreset:active { transform: scale(0.9); }
         
         .timer-presets-scroll { 
@@ -205,7 +208,6 @@
             background: #f8f9fa; color: #636e72; font-weight: 700; font-size: 0.9rem; 
             position: relative; transition: 0.2s;
         }
-        /* Effet shake quand suppression activée */
         .btn-preset.shake { animation: shake 0.3s infinite; background: #fff0f0; color: #ff6b6b; border: 1px dashed #ff6b6b; }
 
         .overlay-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
@@ -302,7 +304,7 @@
 </div>
 
 <div id="overlayBackdrop" class="overlay-backdrop" onclick="toggleTimerPanel()"></div>
-<button id="floatingTimerBtn" oncontextmenu="event.preventDefault(); return false;">01:30</button>
+<button id="floatingTimerBtn" oncontextmenu="return false;">01:30</button>
 <div id="timerPanel">
     <div style="width:40px; height:4px; background:#e9ecef; border-radius:2px; margin:0 auto 20px auto;"></div>
     <div class="timer-display" id="timerDisplay">01:30</div>
@@ -352,11 +354,10 @@
     let lastDuration = 90; 
     let isTimerRunning = false;
 
-    // DRAG VARIABLES (V105)
+    // V106: POINTER EVENTS VARIABLES
     const floatBtn = document.getElementById('floatingTimerBtn');
     let isDragging = false;
-    let startX, startY;
-    let initialX, initialY;
+    let startX, startY, initialLeft, initialTop;
 
     const allColors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#E0BBE4', '#FF9AA2', '#957DAD'];
     let colorBag = [];
@@ -376,12 +377,84 @@
         renderHistory();
         renderCalendar();
         initSortable();
-        updateTimerDisplay(); // V101: Will set initial text on float button
+        updateTimerDisplay(); // V106
         initDrag();
         renderPresets(); 
     });
 
-    // --- V100 PRESETS LOGIC ---
+    // --- V106 POINTER EVENTS LOGIC (STABLE) ---
+    function initDrag() {
+        // Pointer down: prepare drag
+        floatBtn.addEventListener('pointerdown', (e) => {
+            // Important: capture pointer to track movement even if fast
+            floatBtn.setPointerCapture(e.pointerId);
+            
+            isDragging = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const rect = floatBtn.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            
+            // Visual feedback
+            floatBtn.style.transform = "scale(0.95)";
+        });
+
+        // Pointer move: move element if threshold passed
+        floatBtn.addEventListener('pointermove', (e) => {
+            if (!floatBtn.hasPointerCapture(e.pointerId)) return;
+
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            // Threshold of 10px to consider it a drag
+            if (!isDragging && Math.hypot(dx, dy) > 10) {
+                isDragging = true;
+            }
+
+            if (isDragging) {
+                e.preventDefault();
+                const maxX = window.innerWidth - floatBtn.offsetWidth;
+                const maxY = window.innerHeight - floatBtn.offsetHeight;
+                
+                let newLeft = initialLeft + dx;
+                let newTop = initialTop + dy;
+                
+                // Boundaries
+                if(newLeft < 0) newLeft = 0;
+                if(newLeft > maxX) newLeft = maxX;
+                if(newTop < 0) newTop = 0;
+                if(newTop > maxY) newTop = maxY;
+
+                floatBtn.style.left = newLeft + 'px';
+                floatBtn.style.top = newTop + 'px';
+                floatBtn.style.right = 'auto';
+                floatBtn.style.bottom = 'auto';
+            }
+        });
+
+        // Pointer up: Check if it was a tap or drag
+        floatBtn.addEventListener('pointerup', (e) => {
+            floatBtn.releasePointerCapture(e.pointerId);
+            floatBtn.style.transform = "scale(1)"; // Reset scale
+            
+            if (!isDragging) {
+                // It was a tap!
+                toggleTimerPanel();
+            }
+            isDragging = false;
+        });
+        
+        // Disable context menu (long press)
+        floatBtn.oncontextmenu = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        };
+    }
+
+    // --- PRESETS LOGIC ---
     function renderPresets() {
         const container = document.getElementById('presetContainer');
         container.innerHTML = '';
@@ -417,7 +490,6 @@
             } else {
                 seconds = parseInt(input);
             }
-            
             if (seconds > 0 && !isNaN(seconds)) {
                 timerPresets.push(seconds);
                 timerPresets.sort((a,b) => a - b); 
@@ -433,105 +505,6 @@
         isEditingPresets = !isEditingPresets;
         document.getElementById('btnEditPresets').classList.toggle('active');
         renderPresets();
-    }
-
-    // --- DRAG LOGIC (V105 - SIMPLIFIED) ---
-    function initDrag() {
-        // TOUCH EVENTS
-        floatBtn.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            startX = touch.clientX;
-            startY = touch.clientY;
-            
-            // Current position of element
-            const rect = floatBtn.getBoundingClientRect();
-            initialX = rect.left;
-            initialY = rect.top;
-            
-            isDragging = false; // Reset drag state
-        }, {passive: false});
-
-        floatBtn.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const dx = touch.clientX - startX;
-            const dy = touch.clientY - startY;
-            
-            // If moved more than 5px, it's a drag
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                isDragging = true;
-                e.preventDefault(); // Stop scrolling
-                
-                let newX = initialX + dx;
-                let newY = initialY + dy;
-                
-                // Boundaries
-                const maxX = window.innerWidth - floatBtn.offsetWidth;
-                const maxY = window.innerHeight - floatBtn.offsetHeight;
-                
-                if (newX < 0) newX = 0; if (newX > maxX) newX = maxX;
-                if (newY < 0) newY = 0; if (newY > maxY) newY = maxY;
-                
-                floatBtn.style.left = newX + 'px';
-                floatBtn.style.top = newY + 'px';
-                floatBtn.style.right = 'auto';
-                floatBtn.style.bottom = 'auto';
-            }
-        }, {passive: false});
-
-        floatBtn.addEventListener('touchend', (e) => {
-            if (!isDragging) {
-                toggleTimerPanel(); // It was a click
-            }
-            isDragging = false;
-        });
-
-        // MOUSE EVENTS (Desktop)
-        floatBtn.addEventListener('mousedown', (e) => {
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatBtn.getBoundingClientRect();
-            initialX = rect.left;
-            initialY = rect.top;
-            isDragging = false;
-            
-            // Move handler
-            const onMouseMove = (moveEvent) => {
-                const dx = moveEvent.clientX - startX;
-                const dy = moveEvent.clientY - startY;
-                
-                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                    isDragging = true;
-                    moveEvent.preventDefault();
-                    
-                    let newX = initialX + dx;
-                    let newY = initialY + dy;
-                    
-                    // Boundaries
-                    const maxX = window.innerWidth - floatBtn.offsetWidth;
-                    const maxY = window.innerHeight - floatBtn.offsetHeight;
-                    
-                    if (newX < 0) newX = 0; if (newX > maxX) newX = maxX;
-                    if (newY < 0) newY = 0; if (newY > maxY) newY = maxY;
-                    
-                    floatBtn.style.left = newX + 'px';
-                    floatBtn.style.top = newY + 'px';
-                    floatBtn.style.right = 'auto';
-                    floatBtn.style.bottom = 'auto';
-                }
-            };
-            
-            // Up handler
-            const onMouseUp = () => {
-                if (!isDragging) {
-                    toggleTimerPanel();
-                }
-                document.removeEventListener('mousemove', onMouseMove);
-                document.removeEventListener('mouseup', onMouseUp);
-            };
-            
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-        });
     }
 
     // --- TIMER LOGIC ---
@@ -878,16 +851,17 @@
         for(let s=1; s<=max; s++) { 
             html += `<div class="set-block">`;
             
-            // LIGNE EXO A
+            // LIGNE EXO A (Si la série existe pour A)
             if (s <= exoA.sets) {
                 const dataA = getSplitPerf(exoA.name, s, progName); 
                 const mainPerfHTMLA = (dataA && dataA.main) ? `<span class="last-perf">Précédent : ${dataA.main}</span>` : '';
                 html += `<div class="serie-container" id="container_${idxA}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">A</div><button class="btn-mini-add" onclick="ajouterDegressive('${idxA}_${s}', '${safeExoNameA}', '${safeProgName}', ${s})">+</button></div>${createInputWithUnit(`p_${idxA}_${s}`, 'kg')}${createInputWithUnit(`r_${idxA}_${s}`, 'reps')}</div>${mainPerfHTMLA}</div>`;
             } else {
+                // Placeholder invisible pour garder l'alignement ou vide
                 html += `<div class="serie-container" style="opacity:0.3; pointer-events:none;"><div class="input-row"><div class="set-col"><div class="set-num">-</div></div><div class="input-wrapper" style="background:transparent; border:1px dashed #eee;"></div></div></div>`;
             }
 
-            // LIGNE EXO B
+            // LIGNE EXO B (Si la série existe pour B)
             if (s <= exoB.sets) {
                 const dataB = getSplitPerf(exoB.name, s, progName); 
                 const mainPerfHTMLB = (dataB && dataB.main) ? `<span class="last-perf">Précédent : ${dataB.main}</span>` : '';
