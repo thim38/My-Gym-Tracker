@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V104 Touch Fix</title>
+    <title>Gym Tracker V105 Stable Touch</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <link rel="manifest" href="manifest.json">
@@ -16,7 +16,7 @@
         
         /* GENERAL & RESET */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 120px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; overflow-x: hidden; user-select: none; /* Global selection off for better app feel */ }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 120px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; overflow-x: hidden; user-select: none; }
         h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; font-size: 1.4rem; letter-spacing: -0.5px; animation: fadeInDown 0.5s ease; }
         
         .container { max-width: 600px; margin: 0 auto; position: relative; }
@@ -36,7 +36,7 @@
         select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); -webkit-appearance: none; appearance: none; cursor: pointer; transition: transform 0.1s; }
         select:active { transform: scale(0.98); }
         .input-wrapper { position: relative; flex: 1; min-width: 0; }
-        input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; user-select: text; /* Allow text selection in inputs */ }
+        input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; user-select: text; }
         input:focus { outline: none; background: #fff; border-color: #dfe6e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .unit-label { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 700; color: #b2bec3; pointer-events: none; }
 
@@ -149,8 +149,8 @@
             font-size: 1.1rem; font-weight: 800; z-index: 1000;
             text-shadow: 0 1px 1px rgba(255,255,255,0.5);
             
-            /* IMPORTANT: Only transition visuals, not position */
-            transition: background 0.3s, box-shadow 0.3s, color 0.3s, transform 0.2s;
+            /* V102: No transition on pos to avoid lag */
+            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
             touch-action: none; user-select: none; -webkit-user-select: none;
         }
 
@@ -352,11 +352,11 @@
     let lastDuration = 90; 
     let isTimerRunning = false;
 
-    // DRAG VARIABLES (V104)
+    // DRAG VARIABLES (V105)
     const floatBtn = document.getElementById('floatingTimerBtn');
     let isDragging = false;
     let startX, startY;
-    let dragStartTime = 0;
+    let initialX, initialY;
 
     const allColors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#E0BBE4', '#FF9AA2', '#957DAD'];
     let colorBag = [];
@@ -435,97 +435,102 @@
         renderPresets();
     }
 
-    // --- DRAG LOGIC (V104 FIX) ---
+    // --- DRAG LOGIC (V105 - SIMPLIFIED) ---
     function initDrag() {
+        // TOUCH EVENTS
         floatBtn.addEventListener('touchstart', (e) => {
             const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            
+            // Current position of element
             const rect = floatBtn.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
             
-            isDragging = false; 
-            dragStartTime = new Date().getTime(); // Record time
-            
-            startX = touch.clientX - rect.left;
-            startY = touch.clientY - rect.top;
-            
-            // Record original click position
-            floatBtn.setAttribute('data-start-x', touch.clientX);
-            floatBtn.setAttribute('data-start-y', touch.clientY);
+            isDragging = false; // Reset drag state
         }, {passive: false});
 
         floatBtn.addEventListener('touchmove', (e) => {
-            e.preventDefault(); 
             const touch = e.touches[0];
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
             
-            // Only consider it a drag if moved > 5px (debounce)
-            const originalX = parseFloat(floatBtn.getAttribute('data-start-x'));
-            const originalY = parseFloat(floatBtn.getAttribute('data-start-y'));
-            const dist = Math.hypot(touch.clientX - originalX, touch.clientY - originalY);
-            
-            if (dist > 5) {
+            // If moved more than 5px, it's a drag
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
                 isDragging = true;
-                let x = touch.clientX - startX;
-                let y = touch.clientY - startY;
+                e.preventDefault(); // Stop scrolling
                 
+                let newX = initialX + dx;
+                let newY = initialY + dy;
+                
+                // Boundaries
                 const maxX = window.innerWidth - floatBtn.offsetWidth;
                 const maxY = window.innerHeight - floatBtn.offsetHeight;
                 
-                if(x < 0) x = 0; if(x > maxX) x = maxX;
-                if(y < 0) y = 0; if(y > maxY) y = maxY;
+                if (newX < 0) newX = 0; if (newX > maxX) newX = maxX;
+                if (newY < 0) newY = 0; if (newY > maxY) newY = maxY;
                 
-                floatBtn.style.left = x + 'px';
-                floatBtn.style.top = y + 'px';
+                floatBtn.style.left = newX + 'px';
+                floatBtn.style.top = newY + 'px';
                 floatBtn.style.right = 'auto';
                 floatBtn.style.bottom = 'auto';
             }
         }, {passive: false});
 
         floatBtn.addEventListener('touchend', (e) => {
-            // Check time duration of touch
-            const touchDuration = new Date().getTime() - dragStartTime;
-            
-            // If it wasn't a drag AND touch was quick (< 300ms) = Tap
-            if (!isDragging && touchDuration < 300) {
-                toggleTimerPanel();
+            if (!isDragging) {
+                toggleTimerPanel(); // It was a click
             }
-            
-            // Reset flags
             isDragging = false;
         });
 
-        // Mouse Support
+        // MOUSE EVENTS (Desktop)
         floatBtn.addEventListener('mousedown', (e) => {
-            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
             const rect = floatBtn.getBoundingClientRect();
-            startX = e.clientX - rect.left;
-            startY = e.clientY - rect.top;
-            floatBtn.setAttribute('data-start-x', e.clientX);
-            floatBtn.setAttribute('data-start-y', e.clientY);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                let x = e.clientX - startX;
-                let y = e.clientY - startY;
-                const maxX = window.innerWidth - floatBtn.offsetWidth;
-                const maxY = window.innerHeight - floatBtn.offsetHeight;
-                if(x < 0) x = 0; if(x > maxX) x = maxX;
-                if(y < 0) y = 0; if(y > maxY) y = maxY;
-                floatBtn.style.left = x + 'px';
-                floatBtn.style.top = y + 'px';
-                floatBtn.style.right = 'auto';
-                floatBtn.style.bottom = 'auto';
-            }
-        });
-
-        document.addEventListener('mouseup', (e) => {
-            if (isDragging) {
-                const originalX = parseFloat(floatBtn.getAttribute('data-start-x'));
-                const originalY = parseFloat(floatBtn.getAttribute('data-start-y'));
-                const dist = Math.hypot(e.clientX - originalX, e.clientY - originalY);
-                if (dist < 5) toggleTimerPanel();
-                isDragging = false;
-            }
+            initialX = rect.left;
+            initialY = rect.top;
+            isDragging = false;
+            
+            // Move handler
+            const onMouseMove = (moveEvent) => {
+                const dx = moveEvent.clientX - startX;
+                const dy = moveEvent.clientY - startY;
+                
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    isDragging = true;
+                    moveEvent.preventDefault();
+                    
+                    let newX = initialX + dx;
+                    let newY = initialY + dy;
+                    
+                    // Boundaries
+                    const maxX = window.innerWidth - floatBtn.offsetWidth;
+                    const maxY = window.innerHeight - floatBtn.offsetHeight;
+                    
+                    if (newX < 0) newX = 0; if (newX > maxX) newX = maxX;
+                    if (newY < 0) newY = 0; if (newY > maxY) newY = maxY;
+                    
+                    floatBtn.style.left = newX + 'px';
+                    floatBtn.style.top = newY + 'px';
+                    floatBtn.style.right = 'auto';
+                    floatBtn.style.bottom = 'auto';
+                }
+            };
+            
+            // Up handler
+            const onMouseUp = () => {
+                if (!isDragging) {
+                    toggleTimerPanel();
+                }
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
         });
     }
 
@@ -856,7 +861,6 @@
         container.innerHTML += html; 
     }
     
-    // --- CORRECTION V94 : LOGIQUE SUPERSET (Cases vides si séries inégales) ---
     function renderSuperset(container, exoA, idxA, exoB, idxB, color, progName) { 
         const max = Math.max(exoA.sets, exoB.sets); 
         const safeProgName = progName.replace(/'/g, "\\'"); 
@@ -874,17 +878,16 @@
         for(let s=1; s<=max; s++) { 
             html += `<div class="set-block">`;
             
-            // LIGNE EXO A (Si la série existe pour A)
+            // LIGNE EXO A
             if (s <= exoA.sets) {
                 const dataA = getSplitPerf(exoA.name, s, progName); 
                 const mainPerfHTMLA = (dataA && dataA.main) ? `<span class="last-perf">Précédent : ${dataA.main}</span>` : '';
                 html += `<div class="serie-container" id="container_${idxA}_${s}"><div class="input-row"><div class="set-col"><div class="set-num">A</div><button class="btn-mini-add" onclick="ajouterDegressive('${idxA}_${s}', '${safeExoNameA}', '${safeProgName}', ${s})">+</button></div>${createInputWithUnit(`p_${idxA}_${s}`, 'kg')}${createInputWithUnit(`r_${idxA}_${s}`, 'reps')}</div>${mainPerfHTMLA}</div>`;
             } else {
-                // Placeholder invisible pour garder l'alignement ou vide
                 html += `<div class="serie-container" style="opacity:0.3; pointer-events:none;"><div class="input-row"><div class="set-col"><div class="set-num">-</div></div><div class="input-wrapper" style="background:transparent; border:1px dashed #eee;"></div></div></div>`;
             }
 
-            // LIGNE EXO B (Si la série existe pour B)
+            // LIGNE EXO B
             if (s <= exoB.sets) {
                 const dataB = getSplitPerf(exoB.name, s, progName); 
                 const mainPerfHTMLB = (dataB && dataB.main) ? `<span class="last-perf">Précédent : ${dataB.main}</span>` : '';
