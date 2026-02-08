@@ -19,9 +19,10 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(2deg); } 75% { transform: rotate(-2deg); } 100% { transform: rotate(0deg); } }
 
-/* --- INPUTS & SELECTS --- */
+/* --- INPUTS & SELECTS (STYLE D'ORIGINE) --- */
 select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); -webkit-appearance: none; appearance: none; cursor: pointer; transition: transform 0.1s; }
 select:active { transform: scale(0.98); }
+
 .input-wrapper { position: relative; flex: 1; min-width: 0; }
 input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; user-select: text; }
 input:focus { outline: none; background: #fff; border-color: #dfe6e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -120,15 +121,32 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .btn-backup { background: var(--brand); color: white; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; }
 .btn-restore { background: #636e72; color: white; width: 100%; padding: 12px; font-size: 0.9rem; }
 
-/* --- NAV BAR & ANIMATION SCROLL --- */
-.nav-bar { 
-    position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-    width: 90%; max-width: 400px; background: #fff; padding: 15px; border-radius: 30px; 
-    display: flex; justify-content: space-around; box-shadow: 0 10px 40px rgba(0,0,0,0.08); 
-    z-index: 999; 
-    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s ease;
+/* --- FIX NAVIGATION : MÉTHODE STABLE (Anti-Bug APK) --- */
+.nav-bar {
+    position: fixed !important;
+    bottom: 20px !important;
+    height: 65px !important;
+    
+    /* LE CENTRAGE STABLE (sans %) */
+    left: 15px !important;    /* Collé à 15px du bord gauche */
+    right: 15px !important;   /* Collé à 15px du bord droit */
+    width: auto !important;   /* La largeur s'adapte toute seule */
+    margin: 0 !important;     /* On nettoie les marges */
+    transform: none !important; /* On annule l'ancien effet qui faisait bugger */
+    
+    /* Design de la pilule */
+    background-color: white !important;
+    border-radius: 35px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+    
+    /* Alignement des icônes */
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    z-index: 9999 !important;
+    padding-bottom: 0 !important;
 }
-.nav-bar.scroll-hidden { transform: translateX(-50%) translateY(150%); opacity: 0; pointer-events: none; }
+.nav-bar.scroll-hidden { transform: translateY(150%) !important; opacity: 0; pointer-events: none; }
 .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
 .nav-item.active { color: var(--text-main); transform: scale(1.1); }
 
@@ -231,74 +249,20 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     flex: 0 0 auto; min-width: 72px; padding: 14px 20px; border-radius: 24px;
     background: #f1f3f5; color: #636e72; font-weight: 700; font-size: 0.95rem;
     border: none; transition: 0.2s;
+    border: 2px solid transparent !important;
+    box-sizing: border-box !important;
+    position: relative !important;
 }
 .btn-preset:active { background: #e9ecef; }
-.btn-preset.shake { animation: shake 0.3s infinite; background: #f1f3f5; color: var(--text-gray); border: 1px dashed var(--border-light); }
+.btn-preset.shake { animation: shake 0.3s infinite; background: #f1f3f5; color: var(--text-gray); border-color: transparent !important; }
 
-.overlay-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
-.overlay-backdrop.show { opacity: 1; pointer-events: auto; }
-
-/* --- CORRECTION FOND SUPERSET --- */
-
-/* Force le fond transparent/blanc sur les blocs superset */
-.superset-wrapper,
-.prog-line-superset, 
-.prog-line-superset-b {
-    background-color: transparent !important; /* Enlève le gris */
-    box-shadow: none !important; /* Enlève l'ombre si il y en a une */
-}
-
-/* --- CORRECTION ALIGNEMENT MOBILE --- */
-
-.prog-line, 
-.prog-line-superset, 
-.prog-line-superset-b {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important; /* Centre verticalement si le texte fait 2 lignes */
-    gap: 15px; /* Espace minimum entre le nom et les reps */
-}
-
-/* Le nom de l'exercice : prend toute la place dispo et va à la ligne si trop long */
-.prog-line-name {
-    flex: 1; /* Prend l'espace restant */
-    white-space: normal !important; /* Autorise le retour à la ligne */
-    text-align: left;
-    overflow: hidden;
-}
-
-/* Les infos (Séries x Reps) : ne bougent jamais, ne se coupent jamais */
-.prog-line-info {
-    flex-shrink: 0; /* Interdit de rétrécir cet élément */
-    white-space: nowrap !important; /* Force le texte sur une seule ligne */
-    text-align: right;
-    font-weight: bold; /* Optionnel : pour bien le voir */
-}
-
-/* --- FIX TAILLE & COULEUR BOUTONS TIMER --- */
-
-/* 1. État Normal : On met une bordure transparente pour réserver la place */
-.btn-preset {
-    border: 2px solid transparent !important; /* Bordure invisible */
-    box-sizing: border-box !important;        /* La taille inclut la bordure */
-    position: relative !important;            /* Pour placer la croix */
-    transition: transform 0.1s;
-}
-
-/* 2. État Édition : On garde le tremblement MAIS on empêche le rouge */
-.btn-preset.shake {
-    border-color: transparent !important; /* Reste transparent (pas de rouge) */
-    /* L'animation de tremblement (shake) fonctionnera toujours */
-}
-
-/* 3. La petite croix rouge (Badge) pour supprimer */
 .preset-delete-badge {
     position: absolute !important;
     top: -5px !important;
     right: -5px !important;
     width: 18px;
     height: 18px;
-    background-color: #ff4757; /* La croix reste rouge pour être visible */
+    background-color: #ff4757;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -309,37 +273,37 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     z-index: 10;
     cursor: pointer;
-
 }
 
-/* --- FIX NAVIGATION : MODE CAPSULE FLOTTANTE --- */
+.overlay-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+.overlay-backdrop.show { opacity: 1; pointer-events: auto; }
 
-.nav-bar {
-    /* 1. Positionnement fixe pour qu'elle reste en bas */
-    position: fixed !important;
-    
-    /* 2. On la décolle du sol (20px) pour éviter la barre Android */
-    bottom: 20px !important;
-    
-    /* 3. Hauteur fixe et propre */
-    height: 65px !important;
-    padding-bottom: 0 !important; /* On annule les anciens padding */
+/* --- CORRECTION FOND SUPERSET --- */
+.superset-wrapper,
+.prog-line-superset, 
+.prog-line-superset-b {
+    background-color: transparent !important; /* Enlève le gris */
+    box-shadow: none !important; /* Enlève l'ombre */
+}
 
-    /* 4. Look "Capsule" centré */
-    width: 90% !important;          /* Largeur réduite */
-    left: 5% !important;            /* Centrage (5% à gauche) */
-    right: 5% !important;
-    border-radius: 35px !important; /* Bords très ronds */
-
-    /* 5. Grosse ombre pour l'effet flottant */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
-
-    /* 6. Flexbox pour centrer les icônes */
+/* --- CORRECTION ALIGNEMENT MOBILE --- */
+.prog-line, 
+.prog-line-superset, 
+.prog-line-superset-b {
     display: flex !important;
-    justify-content: space-around !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    
-    /* 7. Couleur de fond (Blanc) */
-    background-color: #ffffff !important;
-    z-index: 9999 !important;
+    gap: 15px;
+}
+.prog-line-name {
+    flex: 1;
+    white-space: normal !important; /* Retour à la ligne autorisé */
+    text-align: left;
+    overflow: hidden;
+}
+.prog-line-info {
+    flex-shrink: 0;
+    white-space: nowrap !important; /* Force une seule ligne */
+    text-align: right;
+    font-weight: bold;
 }
