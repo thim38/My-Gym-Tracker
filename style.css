@@ -121,18 +121,20 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .btn-backup { background: var(--brand); color: white; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; }
 .btn-restore { background: #636e72; color: white; width: 100%; padding: 12px; font-size: 0.9rem; }
 
-/* --- FIX NAVIGATION : CORRIGÉE (Plus haute & moins large) --- */
+/* --- FIX NAVIGATION : PIXEL PERFECT --- */
 .nav-bar {
     position: fixed !important;
-    bottom: 40px !important;      /* REMONTÉE (était 20px) */
-    height: 65px !important;
     
-    /* PILULE COMPACTE ET CENTRÉE */
-    width: 80% !important;        /* MOINS LARGE */
-    max-width: 350px !important;  /* Empêche qu'elle soit géante sur tablette */
-    left: 0 !important;           /* Reset gauche */
-    right: 0 !important;          /* Reset droite */
-    margin: 0 auto !important;    /* Centrage automatique parfait */
+    /* 1. Placement Vertical (Bas de l'écran) */
+    bottom: 25px !important;      
+    height: 60px !important;      /* HAUTEUR FIXE 60px */
+    
+    /* 2. Centrage Absolu */
+    width: 90% !important;        
+    max-width: 400px !important;  
+    left: 0 !important;           
+    right: 0 !important;          
+    margin: 0 auto !important;    
     transform: none !important;
     
     /* Design */
@@ -140,35 +142,52 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     border-radius: 35px !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
     
-    /* Alignement */
+    /* Alignement interne */
     display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
-    z-index: 900 !important;      /* EN DESSOUS DU TIMER (était 9999) */
+    
+    /* Z-INDEX : SOUS LE PANEL */
+    z-index: 100 !important;     
     padding-bottom: 0 !important;
 }
 .nav-bar.scroll-hidden { transform: translateY(150%) !important; opacity: 0; pointer-events: none; }
 .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
 .nav-item.active { color: var(--text-main); transform: scale(1.1); }
 
-/* --- V108 FIXED GLASS TIMER BAR --- */
+/* --- V108 FIXED GLASS TIMER BAR (Version Fine & Compacte) --- */
 #fixedTimerBar {
-    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-    width: 90%; max-width: 400px;
+    position: fixed !important; 
+    
+    /* 1. Placement Vertical (10px au-dessus du menu) */
+    /* 25px (marge bas) + 60px (menu) + 10px (espace) = 95px */
+    bottom: 95px !important; 
+    
+    /* 2. Centrage Absolu (Identique au menu) */
+    width: 90% !important; 
+    max-width: 400px !important; 
+    left: 0 !important; 
+    right: 0 !important; 
+    margin: 0 auto !important;
+    transform: none !important;
+
+    /* 3. TAILLE FINE (Auto) */
+    height: auto !important;     /* S'adapte au texte */
+    padding: 8px 0 !important;   /* Marge interne fine pour l'élégance */
+    
     background: rgba(255, 255, 255, 0.65); 
     backdrop-filter: blur(25px) saturate(110%); -webkit-backdrop-filter: blur(25px) saturate(110%);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border-radius: 20px;
-    padding: 10px 20px;
+    border-radius: 35px !important; /* Mêmes arrondis que le menu */
+    
     display: flex; justify-content: center; align-items: center; 
     z-index: 1000; cursor: pointer;
     transition: all 0.2s ease;
 }
-#fixedTimerBar:active { transform: translateX(-50%) scale(0.98); }
+#fixedTimerBar:active { transform: scale(0.98) !important; }
 #fixedTimerBar.alert { background: rgba(255, 107, 107, 0.85); animation: pulse 1s infinite; }
-/* Timer se colle en bas de l'écran quand la nav bar est cachée (scroll vers le bas) */
-#fixedTimerBar.scroll-lowered { bottom: 20px; }
+#fixedTimerBar.scroll-lowered { bottom: 20px !important; }
 .timer-bar-text { font-size: 1.2rem; font-weight: 900; color: var(--text-main); font-variant-numeric: tabular-nums; }
 #fixedTimerBar.alert .timer-bar-text { color: white; }
 
@@ -177,7 +196,11 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     position: fixed; bottom: 0; left: 0; width: 100%;
     background: #fafbfc; border-radius: 28px 28px 0 0;
     box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
-    z-index: 1001; padding: 12px 28px 36px; transform: translateY(100%);
+    
+    /* Z-INDEX TRÈS HAUT (Au-dessus de tout) */
+    z-index: 2000 !important; 
+    
+    padding: 12px 28px 36px; transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
     text-align: center; touch-action: pan-y;
 }
@@ -307,53 +330,4 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     white-space: nowrap !important; /* Force une seule ligne */
     text-align: right;
     font-weight: bold;
-}
-
-/* --- TEST DEBUG (A SUPPRIMER PLUS TARD) --- */
-
-.nav-bar {
-    position: fixed !important;
-    bottom: 25px !important;
-    height: 60px !important;
-    width: 90% !important;
-    max-width: 400px !important;
-    left: 0 !important; 
-    right: 0 !important; 
-    margin: 0 auto !important;
-    transform: none !important;
-    
-    background-color: white !important;
-    border-radius: 35px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
-    
-    display: flex !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    z-index: 100 !important;
-    padding-bottom: 0 !important;
-    
-    /* DEBUG : SI TU VOIS DU ROUGE, LE CODE MARCHE */
-    border: 2px solid red !important; 
-}
-
-#fixedTimerBar {
-    position: fixed !important; 
-    bottom: 95px !important; /* 25 + 60 + 10 */
-    left: 50% !important; 
-    transform: translateX(-50%) !important;
-    
-    width: 90% !important; 
-    max-width: 400px !important;
-    height: 60px !important; 
-    
-    background: rgba(255, 255, 255, 0.65) !important; 
-    backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 35px !important;
-    
-    display: flex !important; 
-    justify-content: center !important; 
-    align-items: center !important; 
-    z-index: 1000 !important;
-    padding: 0 !important;
 }
