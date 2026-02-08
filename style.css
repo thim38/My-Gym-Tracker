@@ -121,29 +121,30 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .btn-backup { background: var(--brand); color: white; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; }
 .btn-restore { background: #636e72; color: white; width: 100%; padding: 12px; font-size: 0.9rem; }
 
-/* --- FIX NAVIGATION : MÉTHODE STABLE (Anti-Bug APK) --- */
+/* --- FIX NAVIGATION : CORRIGÉE (Plus haute & moins large) --- */
 .nav-bar {
     position: fixed !important;
-    bottom: 20px !important;
+    bottom: 40px !important;      /* REMONTÉE (était 20px) */
     height: 65px !important;
     
-    /* LE CENTRAGE STABLE (sans %) */
-    left: 15px !important;    /* Collé à 15px du bord gauche */
-    right: 15px !important;   /* Collé à 15px du bord droit */
-    width: auto !important;   /* La largeur s'adapte toute seule */
-    margin: 0 !important;     /* On nettoie les marges */
-    transform: none !important; /* On annule l'ancien effet qui faisait bugger */
+    /* PILULE COMPACTE ET CENTRÉE */
+    width: 80% !important;        /* MOINS LARGE */
+    max-width: 350px !important;  /* Empêche qu'elle soit géante sur tablette */
+    left: 0 !important;           /* Reset gauche */
+    right: 0 !important;          /* Reset droite */
+    margin: 0 auto !important;    /* Centrage automatique parfait */
+    transform: none !important;
     
-    /* Design de la pilule */
+    /* Design */
     background-color: white !important;
     border-radius: 35px !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
     
-    /* Alignement des icônes */
+    /* Alignement */
     display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
-    z-index: 9999 !important;
+    z-index: 900 !important;      /* EN DESSOUS DU TIMER (était 9999) */
     padding-bottom: 0 !important;
 }
 .nav-bar.scroll-hidden { transform: translateY(150%) !important; opacity: 0; pointer-events: none; }
