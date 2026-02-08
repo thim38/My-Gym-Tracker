@@ -34,6 +34,7 @@
 
     <div id="view-progs" class="app-view hidden">
         <button class="builder-btn" onclick="toggleBuilder()">Créer une Séance</button>
+        
         <div id="builderArea" class="hidden">
             <h3 style="margin-top:0">Nouvelle Séance</h3>
             <input type="text" id="newProgName" placeholder="Nom de la séance" style="margin-bottom:15px;">
@@ -70,6 +71,7 @@
             <div id="builderListDisplay" style="margin-bottom:15px; margin-top:15px;"></div>
             <button id="btnSaveProg" class="btn-primary" onclick="sauvegarderProgrammeFinal()">Sauvegarder la Séance</button>
         </div>
+
         <div id="listeMesProgrammes"></div>
     </div>
 
@@ -79,6 +81,7 @@
             <button id="histActionBtn" class="btn-danger" onclick="resetHistoryOnly()">Effacer toutes les Séances</button>
         </div>
         <div id="listeHistorique"></div>
+        
         <div class="backup-area">
             <h4 style="margin-top:0; color:#b2bec3;">GESTION DES DONNÉES</h4>
             <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
@@ -104,32 +107,6 @@
             <div id="daySessionsList" style="margin-top:10px; color:#636e72;">Cliquez sur un jour pour voir les détails.</div>
         </div>
     </div>
-</div>
-
-<div id="overlayBackdrop" class="overlay-backdrop" onclick="toggleTimerPanel()"></div>
-
-<div id="fixedTimerBar" onclick="toggleTimerPanel()">
-    <span class="timer-bar-text" id="barTimerText">01:30</span>
-</div>
-
-<div id="timerPanel">
-    <div class="timer-panel-handle" id="timerPanelHandle" title="Glisser vers le bas pour fermer"></div>
-    
-    <div class="timer-display" id="timerDisplay">01:30</div>
-    
-    <div class="timer-controls">
-        <button class="timer-btn-round timer-btn-hero play" id="playPauseBtn" onclick="toggleTimerState()">▶</button>
-        <button class="timer-btn-round timer-btn-reset" id="resetBtn" onclick="resetTimer()" style="display:none;" title="Réinitialiser">↺</button>
-    </div>
-    
-    <div class="timer-presets-section">
-        <span class="timer-presets-title">Mes temps</span>
-        <div class="timer-presets-header">
-            <button id="btnEditPresets" class="btn-icon-action" onclick="toggleEditPresets()">✖</button>
-            <button id="btnAddPreset" class="btn-icon-action" onclick="addCustomPreset()">+</button>
-        </div>
-    </div>
-    <div class="timer-presets-scroll" id="presetContainer"></div>
 </div>
 
 <nav class="nav-bar">
