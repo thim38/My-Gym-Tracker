@@ -121,20 +121,18 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .btn-backup { background: var(--brand); color: white; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; }
 .btn-restore { background: #636e72; color: white; width: 100%; padding: 12px; font-size: 0.9rem; }
 
-/* --- FIX NAVIGATION : ALIGNEMENT PIXEL PERFECT --- */
+/* --- FIX NAVIGATION : CORRIGÉE (Plus haute & moins large) --- */
 .nav-bar {
     position: fixed !important;
+    bottom: 40px !important;      /* REMONTÉE (était 20px) */
+    height: 65px !important;
     
-    /* 1. Placement Vertical Fluide */
-    bottom: 25px !important;      /* Un peu moins haut */
-    height: 60px !important;      /* Un peu moins épais (était 65) */
-    
-    /* 2. Largeur Alignée avec le Chrono (90%) */
-    width: 90% !important;        /* Exactement comme le timer */
-    max-width: 400px !important;  /* Exactement comme le timer */
-    left: 0 !important;           /* Reset */
-    right: 0 !important;          /* Reset */
-    margin: 0 auto !important;    /* Centrage parfait */
+    /* PILULE COMPACTE ET CENTRÉE */
+    width: 80% !important;        /* MOINS LARGE */
+    max-width: 350px !important;  /* Empêche qu'elle soit géante sur tablette */
+    left: 0 !important;           /* Reset gauche */
+    right: 0 !important;          /* Reset droite */
+    margin: 0 auto !important;    /* Centrage automatique parfait */
     transform: none !important;
     
     /* Design */
@@ -142,13 +140,11 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     border-radius: 35px !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
     
-    /* Alignement interne */
+    /* Alignement */
     display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
-    
-    /* 3. Z-INDEX CORRIGÉ : Doit être INFÉRIEUR au panel chrono (2000) */
-    z-index: 100 !important;     
+    z-index: 900 !important;      /* EN DESSOUS DU TIMER (était 9999) */
     padding-bottom: 0 !important;
 }
 .nav-bar.scroll-hidden { transform: translateY(150%) !important; opacity: 0; pointer-events: none; }
@@ -157,15 +153,8 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 
 /* --- V108 FIXED GLASS TIMER BAR --- */
 #fixedTimerBar {
-    position: fixed; 
-    
-    /* 4. Placement CALCULÉ pour être 10px au-dessus de la nav-bar */
-    /* Bottom Nav (25) + Hauteur Nav (60) + Espace (10) = 95px */
-    bottom: 95px !important; 
-    
-    left: 50%; transform: translateX(-50%);
-    width: 90%; max-width: 400px; /* Largeur identique à la nav-bar */
-    
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    width: 90%; max-width: 400px;
     background: rgba(255, 255, 255, 0.65); 
     backdrop-filter: blur(25px) saturate(110%); -webkit-backdrop-filter: blur(25px) saturate(110%);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -188,11 +177,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     position: fixed; bottom: 0; left: 0; width: 100%;
     background: #fafbfc; border-radius: 28px 28px 0 0;
     box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
-    
-    /* 5. Z-INDEX TRÈS HAUT pour passer au-dessus de la nav-bar */
-    z-index: 2000 !important; 
-    
-    padding: 12px 28px 36px; transform: translateY(100%);
+    z-index: 1001; padding: 12px 28px 36px; transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
     text-align: center; touch-action: pan-y;
 }
