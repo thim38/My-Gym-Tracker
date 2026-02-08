@@ -312,28 +312,34 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 
 }
 
-/* --- FIX NAVIGATION : MODE CAPSULE FLOTTANTE --- /
+/* --- FIX NAVIGATION : MODE CAPSULE FLOTTANTE --- */
 
 .nav-bar {
-    / 1. On annule l'erreur précédente /
-    padding-bottom: 0 !important; 
-    height: 65px !important; / On force une hauteur fixe et propre /
+    /* 1. Positionnement fixe pour qu'elle reste en bas */
+    position: fixed !important;
+    
+    /* 2. On la décolle du sol (20px) pour éviter la barre Android */
+    bottom: 20px !important;
+    
+    /* 3. Hauteur fixe et propre */
+    height: 65px !important;
+    padding-bottom: 0 !important; /* On annule les anciens padding */
 
-    / 2. On décolle la barre du sol pour éviter les boutons Android /
-    bottom: 20px !important; 
+    /* 4. Look "Capsule" centré */
+    width: 90% !important;          /* Largeur réduite */
+    left: 5% !important;            /* Centrage (5% à gauche) */
+    right: 5% !important;
+    border-radius: 35px !important; /* Bords très ronds */
 
-    / 3. On lui donne un look "Capsule" centré /
-    width: 90% !important;      / Ne prend pas toute la largeur /
-    left: 5% !important;        / Centré (5% à gauche + 90% + 5% à droite) /
-    border-radius: 30px !important; / Bords bien arrondis /
+    /* 5. Grosse ombre pour l'effet flottant */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
 
-    / 4. Grosse ombre pour bien la voir flotter /
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
-
-    / 5. On s'assure que les boutons dedans sont bien centrés /
+    /* 6. Flexbox pour centrer les icônes */
     display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
-    background-color: white !important; / Fond blanc (ou ta couleur de thème) */
+    
+    /* 7. Couleur de fond (Blanc) */
+    background-color: #ffffff !important;
     z-index: 9999 !important;
 }
