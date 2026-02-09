@@ -17,10 +17,35 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 .anim-right { animation: slideInRight 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 .anim-left { animation: slideInLeft 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
+/* --- SEGMENTED CONTROL (SWITCH LISTE/CALENDRIER) --- */
+.segmented-control {
+    display: flex;
+    background: #e9ecef;
+    padding: 4px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    position: relative;
+}
+.segment-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: #636e72;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+.segment-btn.active {
+    background: #fff;
+    color: var(--text-main);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 /* --- INPUTS & SELECTS --- */
 select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); -webkit-appearance: none; appearance: none; cursor: pointer; transition: transform 0.1s; }
 select:active { transform: scale(0.98); }
-
 .input-wrapper { position: relative; flex: 1; min-width: 0; }
 input { width: 100%; padding: 14px; padding-right: 35px; background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; font-weight: 600; font-size: 16px; color: var(--text-main); transition: 0.3s; user-select: text; }
 input:focus { outline: none; background: #fff; border-color: #dfe6e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -119,15 +144,12 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .btn-backup { background: var(--brand); color: white; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 0.9rem; }
 .btn-restore { background: #636e72; color: white; width: 100%; padding: 12px; font-size: 0.9rem; }
 
-/* --- NAVIGATION BAR : SEULE ET UNIQUE --- */
+/* --- NAVIGATION BAR : VERSION 3 ONGLETS --- */
 .nav-bar {
     position: fixed !important;
+    bottom: 30px !important;      
+    height: 55px !important;      
     
-    /* PLACEMENT CLEAN */
-    bottom: 30px !important;      /* Flotte joliment au-dessus du bord */
-    height: 55px !important;      /* Taille fine et moderne */
-    
-    /* CENTRAGE PARFAIT */
     width: 90% !important;        
     max-width: 400px !important;  
     left: 0 !important;           
@@ -135,13 +157,12 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     margin: 0 auto !important;    
     transform: none !important;
     
-    /* Design */
     background-color: white !important;
     border-radius: 35px !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
     
     display: flex !important;
-    justify-content: space-around !important;
+    justify-content: space-around !important; /* Espace réparti équitablement pour 3 */
     align-items: center !important;
     
     z-index: 1000 !important;     
@@ -151,32 +172,11 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
 .nav-item.active { color: var(--text-main); transform: scale(1.1); }
 
-/* --- CORRECTION FOND SUPERSET --- */
-.superset-wrapper,
-.prog-line-superset, 
-.prog-line-superset-b {
-    background-color: transparent !important;
-    box-shadow: none !important;
-}
+/* --- SECURITE ANTI-FANTOME (Juste au cas où) --- */
+#fixedTimerBar, #timerPanel, #overlayBackdrop { display: none !important; }
 
-/* --- CORRECTION ALIGNEMENT MOBILE --- */
-.prog-line, 
-.prog-line-superset, 
-.prog-line-superset-b {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 15px;
-}
-.prog-line-name {
-    flex: 1;
-    white-space: normal !important;
-    text-align: left;
-    overflow: hidden;
-}
-.prog-line-info {
-    flex-shrink: 0;
-    white-space: nowrap !important;
-    text-align: right;
-    font-weight: bold;
-}
+/* --- CORRECTION FOND SUPERSET --- */
+.superset-wrapper, .prog-line-superset, .prog-line-superset-b { background-color: transparent !important; box-shadow: none !important; }
+.prog-line, .prog-line-superset, .prog-line-superset-b { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 15px; }
+.prog-line-name { flex: 1; white-space: normal !important; text-align: left; overflow: hidden; }
+.prog-line-info { flex-shrink: 0; white-space: nowrap !important; text-align: right; font-weight: bold; }
