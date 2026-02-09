@@ -407,15 +407,14 @@ function renderHistory() {
     if(historyMode !== 'list') return; 
     const container = document.getElementById('listeHistorique'); 
     const titleEl = document.getElementById('histMainTitle'); 
-    const btnEl = document.getElementById('histActionBtn'); 
     container.innerHTML = ''; 
-    if(DB.history.length === 0) { titleEl.innerText = "Types de Séances"; btnEl.innerText = "Effacer tout"; btnEl.onclick = resetHistoryOnly; container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée.</p>'; historyState.view = 'categories'; historyState.selected = null; return; } 
+    if(DB.history.length === 0) { titleEl.innerText = "Types de Séances"; container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée.</p>'; historyState.view = 'categories'; historyState.selected = null; return; } 
     if (historyState.view === 'categories') { 
-        titleEl.innerText = "Types de Séances"; btnEl.innerText = "Effacer tout"; btnEl.onclick = resetHistoryOnly; 
+        titleEl.innerText = "Types de Séances"; 
         const groups = {}; DB.history.forEach(s => { if(!groups[s.programName]) groups[s.programName] = 0; groups[s.programName]++; }); 
         Object.keys(groups).forEach(name => { const count = groups[name]; const btn = document.createElement('div'); btn.className = 'hist-category-btn'; btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; container.appendChild(btn); }); 
     } else { 
-        titleEl.innerText = "SÉANCES " + historyState.selected; btnEl.innerText = "Effacer " + historyState.selected; btnEl.onclick = () => deleteCategoryHistory(historyState.selected); 
+        titleEl.innerText = "SÉANCES " + historyState.selected; 
         const backBtn = document.createElement('div'); backBtn.className = 'btn-back-hist'; backBtn.innerText = 'Retour aux types de Séances'; backBtn.onclick = () => { historyState.view = 'categories'; historyState.selected = null; renderHistory(); }; container.appendChild(backBtn); 
         const filtered = DB.history.filter(s => s.programName === historyState.selected); 
         filtered.forEach(session => { 
@@ -641,6 +640,16 @@ function drawWeightChart() {
             ctx.fillText(str, p.x, h - 5);
         }
     });
+}
+
+// --- GESTION PARAMETRES (MODAL) ---
+function toggleSettings() {
+    const modal = document.getElementById('settingsModal');
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+    } else {
+        modal.classList.add('hidden');
+    }
 }
 
 // --- IMPORT / EXPORT ---
