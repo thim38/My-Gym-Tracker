@@ -223,7 +223,7 @@ function updateHistoryTitle() { const t = document.getElementById('mainTitle'); 
 function renderHistory() { 
     if(historyMode !== 'list') return; 
     const container = document.getElementById('listeHistorique'); container.innerHTML = ''; 
-    if(DB.history.length === 0) { container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance pour le moment.</p>'; historyState.view = 'categories'; return; } 
+    if(DB.history.length === 0) { container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée pour le moment.</p>'; historyState.view = 'categories'; return; } 
     if (historyState.view === 'categories') { 
         const groups = {}; DB.history.forEach(s => { if(!groups[s.programName]) groups[s.programName] = 0; groups[s.programName]++; }); 
         Object.keys(groups).forEach(name => { const count = groups[name]; const btn = document.createElement('div'); btn.className = 'hist-category-btn'; btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; container.appendChild(btn); }); 
@@ -263,7 +263,7 @@ function changeMonth(delta) { currentCalDate.setMonth(currentCalDate.getMonth() 
 function showDayDetails(dateStr) {
     const listDiv = document.getElementById('daySessionsList'); listDiv.innerHTML = '';
     const sessions = DB.history.filter(s => s.date === dateStr);
-    if (sessions.length === 0) { listDiv.innerHTML = '<div style="color:#b2bec3;">Rien ce jour-là.</div>'; return; }
+    if (sessions.length === 0) { listDiv.innerHTML = '<div style="color:#b2bec3;">Aucune séance ce jour-là.</div>'; return; }
     sessions.forEach(s => { const item = document.createElement('div'); item.className = 'session-item-detail'; item.innerHTML = `<span>${s.programName}</span>`; listDiv.appendChild(item); });
 }
 
@@ -280,7 +280,7 @@ function addWeightEntry() {
 function deleteWeight(index) { if(confirm("Supprimer ?")) { DB.weight.splice(index, 1); localStorage.setItem('gym_weight', JSON.stringify(DB.weight)); renderWeightView(); } }
 function renderWeightList() {
     const div = document.getElementById('weightHistoryList'); div.innerHTML = ''; const sorted = [...DB.weight].reverse();
-    if(sorted.length===0) { div.innerHTML='<p style="text-align:center; color:#b2bec3">Vide</p>'; return; }
+    if(sorted.length===0) { div.innerHTML='<p style="text-align:center; color:#b2bec3">Aucune pesée enregistrée.</p>'; return; }
     sorted.forEach((item, i) => { const realIndex = DB.weight.length - 1 - i; div.innerHTML += `<div class="weight-item"><span class="weight-date">${new Date(item.date).toLocaleDateString()}</span><div><span class="weight-val">${item.value} kg</span><button class="btn-del-weight" onclick="deleteWeight(${realIndex})">✖</button></div></div>`; });
 }
 function drawWeightChart() {
