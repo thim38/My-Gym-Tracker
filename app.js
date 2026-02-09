@@ -1,10 +1,9 @@
-// --- BASE DE DONNÉES ---
+// --- DONNEES ---
 let DB = {
     progs: JSON.parse(localStorage.getItem('gym_v8_progs')) || {},
     history: JSON.parse(localStorage.getItem('gym_v21_history')) || [],
     weight: JSON.parse(localStorage.getItem('gym_weight')) || []
 };
-
 let currentSessionLogs = [];
 let tempBuilderList = [];
 let currentEditingIndex = -1; 
@@ -14,7 +13,7 @@ let historyMode = 'list';
 let historyState = { view: 'categories', selected: null };
 let currentProgramKey = ''; 
 
-// --- SCROLL DETECTION ---
+// --- SCROLL ---
 let lastScrollTop = 0;
 const navBarElement = document.querySelector('.nav-bar');
 window.addEventListener('scroll', function() {
@@ -25,14 +24,13 @@ window.addEventListener('scroll', function() {
     lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
 }, false);
 
-// --- INITIALISATION ---
+// --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     updateSelectMenu(); renderProgramList(); renderHistory(); renderCalendar();
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('weightDateInput');
     if(dateInput) dateInput.value = today;
     
-    // RESTAURATION SESSION
     const savedSession = localStorage.getItem('gym_active_session');
     if (savedSession) {
         try {
@@ -47,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- NAVIGATION ---
+// --- NAV ---
 function switchTab(viewName, btn, newIndex) {
     if (newIndex === currentTabIndex) return;
     const direction = newIndex > currentTabIndex ? 'right' : 'left';
@@ -62,13 +60,9 @@ function switchTab(viewName, btn, newIndex) {
     if(viewName === 'progs') titleEl.innerText = "Mon Programme";
     if(viewName === 'history') { updateHistoryTitle(); if(historyMode === 'calendar') renderCalendar(); if(historyMode === 'weight') renderWeightView(); }
 }
+function toggleSettings() { document.getElementById('settingsModal').classList.toggle('hidden'); }
 
-function toggleSettings() {
-    const modal = document.getElementById('settingsModal');
-    modal.classList.toggle('hidden');
-}
-
-// --- CORE SÉANCE ---
+// --- SEANCE ---
 function handleProgramChange() {
     const select = document.getElementById('selectProgram');
     const newKey = select.value;
@@ -229,7 +223,7 @@ function updateHistoryTitle() { const t = document.getElementById('mainTitle'); 
 function renderHistory() { 
     if(historyMode !== 'list') return; 
     const container = document.getElementById('listeHistorique'); container.innerHTML = ''; 
-    if(DB.history.length === 0) { container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Vide.</p>'; historyState.view = 'categories'; return; } 
+    if(DB.history.length === 0) { container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance pour le moment.</p>'; historyState.view = 'categories'; return; } 
     if (historyState.view === 'categories') { 
         const groups = {}; DB.history.forEach(s => { if(!groups[s.programName]) groups[s.programName] = 0; groups[s.programName]++; }); 
         Object.keys(groups).forEach(name => { const count = groups[name]; const btn = document.createElement('div'); btn.className = 'hist-category-btn'; btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; container.appendChild(btn); }); 
