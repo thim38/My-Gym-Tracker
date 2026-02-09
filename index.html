@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V108 Modular</title>
+    <title>Gym Tracker V109 Fusion</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
@@ -76,44 +76,53 @@
     </div>
 
     <div id="view-history" class="app-view hidden">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
-            <h3 id="histMainTitle" style="margin:0; text-transform:uppercase;">Types de Séances</h3>
-            <button id="histActionBtn" class="btn-danger" onclick="resetHistoryOnly()">Effacer toutes les Séances</button>
-        </div>
-        <div id="listeHistorique"></div>
         
-        <div class="backup-area">
-            <h4 style="margin-top:0; color:#b2bec3;">GESTION DES DONNÉES</h4>
-            <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
-            <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
-            <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+        <div class="segmented-control">
+            <button id="switchList" class="segment-btn active" onclick="switchHistoryMode('list')">Liste</button>
+            <button id="switchCal" class="segment-btn" onclick="switchHistoryMode('calendar')">Calendrier</button>
         </div>
+
+        <div id="history-subview-list">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
+                <h3 id="histMainTitle" style="margin:0; text-transform:uppercase;">Types de Séances</h3>
+                <button id="histActionBtn" class="btn-danger" onclick="resetHistoryOnly()">Effacer tout</button>
+            </div>
+            <div id="listeHistorique"></div>
+            
+            <div class="backup-area">
+                <h4 style="margin-top:0; color:#b2bec3;">GESTION DES DONNÉES</h4>
+                <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
+                <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
+                <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+            </div>
+        </div>
+
+        <div id="history-subview-calendar" class="hidden">
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button class="btn-cal-nav" onclick="changeMonth(-1)">&#10094;</button>
+                    <span id="calMonthDisplay" style="font-weight:800; font-size:1.1rem; text-transform:capitalize;"></span>
+                    <button class="btn-cal-nav" onclick="changeMonth(1)">&#10095;</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div><div class="cal-weekday">Jeu</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sam</div><div class="cal-weekday">Dim</div>
+                </div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+            <div id="calendarDetails" style="margin-top:20px;">
+                <h4 style="color:#b2bec3; font-size:0.9rem; text-transform:uppercase;">Détails du jour</h4>
+                <div id="daySessionsList" style="margin-top:10px; color:#636e72;">Cliquez sur un jour pour voir les détails.</div>
+            </div>
+        </div>
+
     </div>
 
-    <div id="view-calendar" class="app-view hidden">
-        <div class="calendar-wrapper">
-            <div class="calendar-header">
-                <button class="btn-cal-nav" onclick="changeMonth(-1)">&#10094;</button>
-                <span id="calMonthDisplay" style="font-weight:800; font-size:1.1rem; text-transform:capitalize;"></span>
-                <button class="btn-cal-nav" onclick="changeMonth(1)">&#10095;</button>
-            </div>
-            <div class="calendar-weekdays">
-                <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div><div class="cal-weekday">Jeu</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sam</div><div class="cal-weekday">Dim</div>
-            </div>
-            <div id="calendarGrid" class="calendar-grid"></div>
-        </div>
-        <div id="calendarDetails" style="margin-top:20px;">
-            <h4 style="color:#b2bec3; font-size:0.9rem; text-transform:uppercase;">Détails du jour</h4>
-            <div id="daySessionsList" style="margin-top:10px; color:#636e72;">Cliquez sur un jour pour voir les détails.</div>
-        </div>
-    </div>
 </div>
 
 <nav class="nav-bar">
     <button class="nav-item active" onclick="switchTab('seance', this, 0)">Séance</button>
     <button class="nav-item" onclick="switchTab('progs', this, 1)">Programme</button>
     <button class="nav-item" onclick="switchTab('history', this, 2)">Historique</button>
-    <button class="nav-item" onclick="switchTab('calendar', this, 3)">Calendrier</button>
 </nav>
 
 <script src="app.js"></script>
