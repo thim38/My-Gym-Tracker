@@ -690,3 +690,51 @@ function toggleSettings() {
 // --- SÉCURITÉS ---
 window.addEventListener('beforeunload', () => { saveCurrentSessionState(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveCurrentSessionState(); });
+
+// --- GESTION DU SWIPE (SLIDE) ---
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener('touchstart', function(event) {
+    touchStartX = event.changedTouches[0].screenX;
+    touchStartY = event.changedTouches[0].screenY;
+}, false);
+
+document.addEventListener('touchend', function(event) {
+    let touchEndX = event.changedTouches[0].screenX;
+    let touchEndY = event.changedTouches[0].screenY;
+    handleSwipeGesture(touchStartX, touchStartY, touchEndX, touchEndY);
+}, false);
+
+function handleSwipeGesture(startX, startY, endX, endY) {
+    let xDiff = endX - startX;
+    let yDiff = endY - startY;
+
+    // On vérifie que le mouvement est horizontal (plus fort en X qu'en Y)
+    // et assez long (> 50px) pour éviter les faux mouvements
+    if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
+        if (xDiff > 0) {
+            // Glissement vers la droite -> Onglet précédent
+            navigateTabs(-1);
+        } else {
+            // Glissement vers la gauche -> Onglet suivant
+            navigateTabs(1);
+        }
+    }
+}
+
+function navigateTabs(direction) {
+    let newIndex = currentTabIndex + direction;
+    
+    // Bloquer pour ne pas aller plus loin que le premier ou dernier onglet
+    if (newIndex < 0) return;
+    if (newIndex > 2) return;
+
+    if (newIndex !== currentTabIndex) {
+        const tabsNames = ['seance', 'progs', 'history'];
+        const navButtons = document.querySelectorAll('.nav-item');
+        // On simule le clic sur le bouton correspondant
+        switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
+    }
+}
+
