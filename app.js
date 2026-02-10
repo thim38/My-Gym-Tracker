@@ -52,15 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (select.querySelector(`option[value="${sessionState.prog}"]`)) {
                 select.value = sessionState.prog;
                 currentProgramKey = sessionState.prog;
+                
+                // MODIFICATION 1 : Charger les logs AVANT l'interface
+                if (sessionState.logs) {
+                    currentSessionLogs = sessionState.logs;
+                }
+                
+                // Maintenant l'interface se charge en sachant ce qui est validé
                 chargerInterface(false);
+                
                 if (sessionState.inputs) {
                     Object.keys(sessionState.inputs).forEach(id => {
                         const el = document.getElementById(id);
-                        if (el) el.value = sessionState.inputs[id];
+                        // On remplit seulement si la case n'est pas bloquée (pas encore validée)
+                        if (el && !el.disabled) el.value = sessionState.inputs[id];
                     });
-                }
-                if (sessionState.logs) {
-                    currentSessionLogs = sessionState.logs;
                 }
             }
         } catch(e) { console.log("Erreur restauration session", e); }
@@ -138,15 +144,55 @@ function chargerInterface(shouldClear = true) {
     const exos = DB.progs[key]; 
     for(let i = 0; i < exos.length; i++) { 
         const exoA = exos[i]; const exoB = exos[i+1]; 
+        
         if(exoA.isSuperset && exoB && exoB.isSuperset) { 
-            renderSuperset(zone, exoA, i, exoB, i+1, key); i++; 
+            // 1. Afficher le Superset
+            renderSuperset(zone, exoA, i, exoB, i+1, key); 
+            
+            // MODIFICATION 2 : Vérifier si validé pour remettre le bouton NOIR et bloquer
+            const isDone = currentSessionLogs.some(log => log.exo === exoA.name || log.exo === exoB.name);
+            if(isDone) {
+                const btn = document.getElementById(`btn_finish_${i}`);
+                if(btn) {
+                    btn.classList.add('validated');
+                    btn.innerText = "Validé";
+                    const container = document.getElementById(`sets_super_${i}`);
+                    if(container) {
+                        container.querySelectorAll('input').forEach(inp => inp.disabled = true);
+                        container.querySelectorAll('.btn-mini-add').forEach(b => b.style.display = 'none');
+                        container.querySelectorAll('.drop-icon').forEach(icon => icon.style.display = 'none');
+                    }
+                }
+            }
+            i++; 
         } else { 
+            // 1. Afficher l'exo Normal
             renderNormal(zone, exoA, i, key); 
+            
+            // MODIFICATION 2 : Vérifier si validé pour remettre le bouton NOIR et bloquer
+            const isDone = currentSessionLogs.some(log => log.exo === exoA.name);
+            if(isDone) {
+                const btn = document.getElementById(`btn_finish_${i}`);
+                if(btn) {
+                    btn.classList.add('validated');
+                    btn.innerText = "Validé";
+                    const container = document.getElementById(`sets_${i}`);
+                    if(container) {
+                        container.querySelectorAll('input').forEach(inp => inp.disabled = true);
+                        container.querySelectorAll('.btn-mini-add').forEach(b => b.style.display = 'none');
+                        container.querySelectorAll('.drop-icon').forEach(icon => icon.style.display = 'none');
+                    }
+                }
+            }
         } 
     } 
     btnZone.innerHTML = `<button class="btn-terminate-session" onclick="terminerLaSeance('${key}')">Terminer la Séance</button>`; 
+    
+    // Ecouter les changements uniquement sur les inputs non bloqués
     document.querySelectorAll('#zoneTravail input').forEach(input => {
-        input.addEventListener('input', saveCurrentSessionState);
+        if(!input.disabled) {
+            input.addEventListener('input', saveCurrentSessionState);
+        }
     });
 }
 
@@ -737,4 +783,3 @@ function navigateTabs(direction) {
         switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
     }
 }
-
