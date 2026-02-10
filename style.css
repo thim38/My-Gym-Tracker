@@ -3,7 +3,18 @@
 
 /* GENERAL & RESET */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; padding-bottom: 150px; -webkit-font-smoothing: antialiased; overscroll-behavior-y: contain; overflow-x: hidden; user-select: none; }
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    background-color: var(--bg-body); 
+    color: var(--text-main); 
+    margin: 0; 
+    padding: 15px; 
+    padding-bottom: 150px; 
+    -webkit-font-smoothing: antialiased; 
+    overscroll-behavior-y: none; /* Bloque le rafraîchissement au swipe (Indispensable) */
+    overflow-x: hidden; 
+    user-select: none; 
+}
 h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; font-size: 1.4rem; letter-spacing: -0.5px; animation: fadeInDown 0.5s ease; margin-top: 10px; }
 
 .container { max-width: 600px; margin: 0 auto; position: relative; }
@@ -41,11 +52,10 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
-/* DATE AJUSTÉE */
 .date-input-styled {
     border: none; background: #fff; padding: 14px; border-radius: 16px; 
     font-family: inherit; color: var(--text-gray); box-shadow: var(--shadow); 
-    width: 135px; /* AJUSTEMENT TAILLE DATE */
+    width: 135px;
 }
 .btn-add-weight { background: var(--brand); color: white; border: none; border-radius: 16px; width: 50px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(45, 52, 54, 0.2); }
 .btn-add-weight:active { transform: scale(0.95); }
@@ -55,16 +65,16 @@ canvas { width: 100%; height: 100%; display: block; }
 .weight-date { font-weight: 600; color: #b2bec3; font-size: 0.9rem; }
 .weight-val { font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
 .btn-del-weight {
-    background: #f1f3f5;       /* Gris clair (comme tes champs de texte) */
-    color: #2d3436;            /* Gris foncé (comme tes titres) */
-    border: 1px solid #e9ecef; /* Bordure très fine pour la finition */
+    background: #f1f3f5;
+    color: #2d3436;
+    border: 1px solid #e9ecef;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     margin-left: 10px;
     font-weight: bold;
     cursor: pointer;
-    display: flex;             /* Permet de centrer la croix parfaitement */
+    display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
@@ -72,7 +82,7 @@ canvas { width: 100%; height: 100%; display: block; }
 }
 
 .btn-del-weight:active {
-    transform: scale(0.9);     /* Petit effet d'appui */
+    transform: scale(0.9);
     background: #e9ecef;
 }
 
@@ -179,26 +189,20 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 
 /* --- NAVIGATION BAR --- */
 .nav-bar {
-    position: fixed !important;
-    bottom: 30px !important;      
-    height: 45px !important;      
-    width: 90% !important;        
-    max-width: 400px !important;  
-    left: 0 !important;           
-    right: 0 !important;          
-    margin: 0 auto !important;    
-    transform: none !important;
-    
-    background-color: white !important;
-    border-radius: 35px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
-    
-    display: flex !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    
-    z-index: 1000 !important;     
-    padding-bottom: 0 !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* Visuellement 45px, mais 20px de sécurité en plus pour le bas */
+    height: 45px;            
+    background: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-top: 10px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    z-index: 1000;
+    padding-bottom: 40px; /* Padding de sécurité */
 }
 .nav-bar.scroll-hidden { transform: translateY(150%) !important; opacity: 0; pointer-events: none; }
 .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
@@ -212,6 +216,3 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .prog-line, .prog-line-superset, .prog-line-superset-b { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 15px; }
 .prog-line-name { flex: 1; white-space: normal !important; text-align: left; overflow: hidden; }
 .prog-line-info { flex-shrink: 0; white-space: nowrap !important; text-align: right; font-weight: bold; }
-
-
-
