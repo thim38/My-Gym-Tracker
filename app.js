@@ -682,12 +682,3 @@ function importData(input) {
 // --- SÉCURITÉS ---
 window.addEventListener('beforeunload', () => { saveCurrentSessionState(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveCurrentSessionState(); });
-
-// --- GESTION PARAMETRES ---
-function toggleSettings() {
-    const modal = document.getElementById('settingsModal');
-    if (modal) {
-        modal.classList.toggle('hidden');
-    }
-}
-
