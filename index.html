@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V110 Poids</title>
+    <title>Gym Tracker V116 Settings</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
@@ -20,8 +20,8 @@
     </script>
 </head>
 <body>
-    
-    <button class="btn-settings-icon" onclick="toggleSettings()">
+
+<button class="btn-settings-icon" onclick="toggleSettings()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
 </button>
 
@@ -30,10 +30,20 @@
         <h2>Paramètres</h2>
         <button class="btn-close-settings" onclick="toggleSettings()">✖</button>
     </div>
+    
     <div class="settings-content">
         <div class="settings-section">
             <h3>Gestion des données</h3>
-            </div>
+            <p style="color:#b2bec3; font-size:0.9rem; margin-bottom:15px; margin-top:0;">Sauvegardez vos progrès ou importez un fichier.</p>
+            
+            <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
+            <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
+            <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+            
+            <div style="height:20px;"></div>
+            
+            <button class="btn-danger-outline" onclick="resetHistoryOnly()" style="width:100%; padding:12px; background:transparent; border:2px solid #ff7675; color:#ff7675; border-radius:16px; font-weight:700;">Réinitialiser l'historique</button>
+        </div>
     </div>
 </div>
 
@@ -102,17 +112,10 @@
         <div id="history-subview-list">
             <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
                 <h3 id="histMainTitle" style="margin:0; text-transform:uppercase;">Types de Séances</h3>
-                <button id="histActionBtn" class="btn-danger" onclick="resetHistoryOnly()">Effacer tout</button>
-            </div>
+                </div>
             <div id="listeHistorique"></div>
             
-            <div class="backup-area">
-                <h4 style="margin-top:0; color:#b2bec3;">GESTION DES DONNÉES</h4>
-                <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
-                <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
-                <input type="file" id="importFile" style="display:none" onchange="importData(this)">
             </div>
-        </div>
 
         <div id="history-subview-calendar" class="hidden">
             <div class="calendar-wrapper">
@@ -163,4 +166,3 @@
 
 </body>
 </html>
-
