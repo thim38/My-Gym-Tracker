@@ -399,7 +399,7 @@ function updateHistoryTitle() {
     const titleEl = document.getElementById('mainTitle');
     if (historyMode === 'list') { titleEl.innerText = "Mon Historique"; } 
     else if (historyMode === 'calendar') { titleEl.innerText = "Mon Calendrier"; }
-    /* MODIFICATION ICI : Titre changé */
+    // TITRE MODIFIÉ ICI
     else if (historyMode === 'weight') { titleEl.innerText = "Mon Suivi de Poids"; }
 }
 
@@ -676,6 +676,14 @@ function importData(input) {
             } catch(err) { alert("Erreur fichier."); }
         };
         reader.readAsText(input.files[0]);
+    }
+}
+
+// --- GESTION PARAMETRES (AJOUT) ---
+function toggleSettings() {
+    const modal = document.getElementById('settingsModal');
+    if (modal) {
+        modal.classList.toggle('hidden');
     }
 }
 
