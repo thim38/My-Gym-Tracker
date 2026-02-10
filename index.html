@@ -1,165 +1,146 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym Tracker V116 Settings</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2d3436">
-    <link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gym Tracker V110 Poids</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2d3436">
+    <link rel="apple-touch-icon" href="icon.png">
 
-    <link rel="stylesheet" href="style.css">
-    
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch((err) => console.log(err));
-      }
-    </script>
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch((err) => console.log(err));
+      }
+    </script>
 </head>
 <body>
 
-<button class="btn-settings-icon" onclick="toggleSettings()">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-</button>
-
-<div id="settingsModal" class="settings-modal hidden">
-    <div class="settings-header">
-        <h2>Paramètres</h2>
-        <button class="btn-close-settings" onclick="toggleSettings()">✖</button>
-    </div>
-    
-    <div class="settings-content">
-        <div class="settings-section">
-            <h3>Gestion des données</h3>
-            <p style="color:#b2bec3; font-size:0.9rem; margin-bottom:15px; margin-top:0;">Sauvegardez vos progrès ou importez un fichier.</p>
-            
-            <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
-            <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
-            <input type="file" id="importFile" style="display:none" onchange="importData(this)">
-            
-            <div style="height:20px;"></div>
-            
-            <button class="btn-danger-outline" onclick="resetHistoryOnly()" style="width:100%; padding:12px; background:transparent; border:2px solid #ff7675; color:#ff7675; border-radius:16px; font-weight:700;">Réinitialiser l'historique</button>
-        </div>
-    </div>
-</div>
-
 <div class="container">
-    <h1 id="mainTitle">Ma Séance</h1>
+    <h1 id="mainTitle">Ma Séance</h1>
 
-    <div id="view-seance" class="app-view">
-        <select id="selectProgram" onchange="handleProgramChange()">
-            <option value="" disabled selected>Choisir une Séance</option>
-        </select>
-        <div id="zoneTravail"></div>
-        <div id="zoneFinSeance"></div>
-    </div>
+    <div id="view-seance" class="app-view">
+        <select id="selectProgram" onchange="handleProgramChange()">
+            <option value="" disabled selected>Choisir une Séance</option>
+        </select>
+        <div id="zoneTravail"></div>
+        <div id="zoneFinSeance"></div>
+    </div>
 
-    <div id="view-progs" class="app-view hidden">
-        <button class="builder-btn" onclick="toggleBuilder()">Créer une Séance</button>
-        
-        <div id="builderArea" class="hidden">
-            <h3 style="margin-top:0">Nouvelle Séance</h3>
-            <input type="text" id="newProgName" placeholder="Nom de la séance" style="margin-bottom:15px;">
-            
-            <div class="builder-block">
-                <span id="labelExoA" class="builder-label hidden">Exercice A (Principal)</span>
-                <input type="text" id="buildExoName" placeholder="Nom de l'exercice" style="margin-bottom:10px;">
-                <div class="builder-row">
-                    <input type="number" id="buildSeries" placeholder="Séries" min="1">
-                    <input type="text" id="buildReps" placeholder="Reps (ex: 10-12)">
-                </div>
-            </div>
-            
-            <div id="blockExoB" class="builder-block hidden">
-                <span class="builder-label">Exercice B (Superset)</span>
-                <input type="text" id="buildExoNameB" placeholder="Nom du 2ème exercice" style="margin-bottom:10px;">
-                <div class="builder-row">
-                    <input type="number" id="buildSeriesB" placeholder="Séries" min="1">
-                    <input type="text" id="buildRepsB" placeholder="Reps (ex: 10-12)">
-                </div>
-            </div>
-            
-            <div id="builderButtons">
-                <div id="btnGroupNormal">
-                    <button id="btnAddNormal" class="btn-add" onclick="ajouterExoAuBuilder()">Ajouter</button>
-                    <button id="btnAddSupersetSwitch" class="btn-add-superset" onclick="activerModeSuperset()">Ajouter un Superset</button>
-                </div>
-                <div id="btnGroupSuperset" class="hidden">
-                    <button id="btnAddSupersetConfirm" class="btn-add-superset" style="background:#2d3436; color:#fff;" onclick="validerSupersetBuilder()">Valider le Superset</button>
-                    <button class="btn-cancel" onclick="annulerModeSuperset()">Annuler le Superset</button>
-                </div>
-            </div>
-            
-            <div id="builderListDisplay" style="margin-bottom:15px; margin-top:15px;"></div>
-            <button id="btnSaveProg" class="btn-primary" onclick="sauvegarderProgrammeFinal()">Sauvegarder la Séance</button>
-        </div>
+    <div id="view-progs" class="app-view hidden">
+        <button class="builder-btn" onclick="toggleBuilder()">Créer une Séance</button>
+        
+        <div id="builderArea" class="hidden">
+            <h3 style="margin-top:0">Nouvelle Séance</h3>
+            <input type="text" id="newProgName" placeholder="Nom de la séance" style="margin-bottom:15px;">
+            
+            <div class="builder-block">
+                <span id="labelExoA" class="builder-label hidden">Exercice A (Principal)</span>
+                <input type="text" id="buildExoName" placeholder="Nom de l'exercice" style="margin-bottom:10px;">
+                <div class="builder-row">
+                    <input type="number" id="buildSeries" placeholder="Séries" min="1">
+                    <input type="text" id="buildReps" placeholder="Reps (ex: 10-12)">
+                </div>
+            </div>
+            
+            <div id="blockExoB" class="builder-block hidden">
+                <span class="builder-label">Exercice B (Superset)</span>
+                <input type="text" id="buildExoNameB" placeholder="Nom du 2ème exercice" style="margin-bottom:10px;">
+                <div class="builder-row">
+                    <input type="number" id="buildSeriesB" placeholder="Séries" min="1">
+                    <input type="text" id="buildRepsB" placeholder="Reps (ex: 10-12)">
+                </div>
+            </div>
+            
+            <div id="builderButtons">
+                <div id="btnGroupNormal">
+                    <button id="btnAddNormal" class="btn-add" onclick="ajouterExoAuBuilder()">Ajouter</button>
+                    <button id="btnAddSupersetSwitch" class="btn-add-superset" onclick="activerModeSuperset()">Ajouter un Superset</button>
+                </div>
+                <div id="btnGroupSuperset" class="hidden">
+                    <button id="btnAddSupersetConfirm" class="btn-add-superset" style="background:#2d3436; color:#fff;" onclick="validerSupersetBuilder()">Valider le Superset</button>
+                    <button class="btn-cancel" onclick="annulerModeSuperset()">Annuler le Superset</button>
+                </div>
+            </div>
+            
+            <div id="builderListDisplay" style="margin-bottom:15px; margin-top:15px;"></div>
+            <button id="btnSaveProg" class="btn-primary" onclick="sauvegarderProgrammeFinal()">Sauvegarder la Séance</button>
+        </div>
 
-        <div id="listeMesProgrammes"></div>
-    </div>
+        <div id="listeMesProgrammes"></div>
+    </div>
 
-    <div id="view-history" class="app-view hidden">
-        
-        <div class="segmented-control">
-            <button id="switchList" class="segment-btn active" onclick="switchHistoryMode('list')">Liste</button>
-            <button id="switchCal" class="segment-btn" onclick="switchHistoryMode('calendar')">Calendrier</button>
-            <button id="switchWeight" class="segment-btn" onclick="switchHistoryMode('weight')">Poids</button>
-        </div>
+    <div id="view-history" class="app-view hidden">
+        
+        <div class="segmented-control">
+            <button id="switchList" class="segment-btn active" onclick="switchHistoryMode('list')">Liste</button>
+            <button id="switchCal" class="segment-btn" onclick="switchHistoryMode('calendar')">Calendrier</button>
+            <button id="switchWeight" class="segment-btn" onclick="switchHistoryMode('weight')">Poids</button>
+        </div>
 
-        <div id="history-subview-list">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
-                <h3 id="histMainTitle" style="margin:0; text-transform:uppercase;">Types de Séances</h3>
-                </div>
-            <div id="listeHistorique"></div>
-            
-            </div>
+        <div id="history-subview-list">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
+                <h3 id="histMainTitle" style="margin:0; text-transform:uppercase;">Types de Séances</h3>
+                <button id="histActionBtn" class="btn-danger" onclick="resetHistoryOnly()">Effacer tout</button>
+            </div>
+            <div id="listeHistorique"></div>
+            
+            <div class="backup-area">
+                <h4 style="margin-top:0; color:#b2bec3;">GESTION DES DONNÉES</h4>
+                <button class="btn-backup" onclick="exportData()">Sauvegarder mes données</button>
+                <button class="btn-restore" onclick="triggerImport()">Importer une sauvegarde</button>
+                <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+            </div>
+        </div>
 
-        <div id="history-subview-calendar" class="hidden">
-            <div class="calendar-wrapper">
-                <div class="calendar-header">
-                    <button class="btn-cal-nav" onclick="changeMonth(-1)">&#10094;</button>
-                    <span id="calMonthDisplay" style="font-weight:800; font-size:1.1rem; text-transform:capitalize;"></span>
-                    <button class="btn-cal-nav" onclick="changeMonth(1)">&#10095;</button>
-                </div>
-                <div class="calendar-weekdays">
-                    <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div><div class="cal-weekday">Jeu</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sam</div><div class="cal-weekday">Dim</div>
-                </div>
-                <div id="calendarGrid" class="calendar-grid"></div>
-            </div>
-            <div id="calendarDetails" style="margin-top:20px;">
-                <h4 style="color:#b2bec3; font-size:0.9rem; text-transform:uppercase;">Détails du jour</h4>
-                <div id="daySessionsList" style="margin-top:10px; color:#636e72;">Cliquez sur un jour pour voir les détails.</div>
-            </div>
-        </div>
+        <div id="history-subview-calendar" class="hidden">
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button class="btn-cal-nav" onclick="changeMonth(-1)">&#10094;</button>
+                    <span id="calMonthDisplay" style="font-weight:800; font-size:1.1rem; text-transform:capitalize;"></span>
+                    <button class="btn-cal-nav" onclick="changeMonth(1)">&#10095;</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div><div class="cal-weekday">Jeu</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sam</div><div class="cal-weekday">Dim</div>
+                </div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+            <div id="calendarDetails" style="margin-top:20px;">
+                <h4 style="color:#b2bec3; font-size:0.9rem; text-transform:uppercase;">Détails du jour</h4>
+                <div id="daySessionsList" style="margin-top:10px; color:#636e72;">Cliquez sur un jour pour voir les détails.</div>
+            </div>
+        </div>
 
-        <div id="history-subview-weight" class="hidden">
-            <div class="weight-input-area">
-                <input type="date" id="weightDateInput" class="date-input-styled">
-                <div style="display:flex; gap:10px; flex:1;">
-                    <input type="number" id="weightValueInput" placeholder="Poids (kg)" step="0.1" inputmode="decimal">
-                    <button class="btn-add-weight" onclick="addWeightEntry()">+</button>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="weightChart"></canvas>
-            </div>
-            
-            <h4 style="color:#b2bec3; font-size:0.8rem; margin-top:20px; margin-bottom:10px;">HISTORIQUE DU POIDS</h4>
-            <div id="weightHistoryList"></div>
-        </div>
+        <div id="history-subview-weight" class="hidden">
+            <div class="weight-input-area">
+                <input type="date" id="weightDateInput" class="date-input-styled">
+                <div style="display:flex; gap:10px; flex:1;">
+                    <input type="number" id="weightValueInput" placeholder="Poids (kg)" step="0.1" inputmode="decimal">
+                    <button class="btn-add-weight" onclick="addWeightEntry()">+</button>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="weightChart"></canvas>
+            </div>
+            
+            <h4 style="color:#b2bec3; font-size:0.8rem; margin-top:20px; margin-bottom:10px;">HISTORIQUE DU POIDS</h4>
+            <div id="weightHistoryList"></div>
+        </div>
 
-    </div>
+    </div>
 
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" onclick="switchTab('seance', this, 0)">Séance</button>
-    <button class="nav-item" onclick="switchTab('progs', this, 1)">Programme</button>
-    <button class="nav-item" onclick="switchTab('history', this, 2)">Historique</button>
+    <button class="nav-item active" onclick="switchTab('seance', this, 0)">Séance</button>
+    <button class="nav-item" onclick="switchTab('progs', this, 1)">Programme</button>
+    <button class="nav-item" onclick="switchTab('history', this, 2)">Historique</button>
 </nav>
 
 <script src="app.js"></script>
