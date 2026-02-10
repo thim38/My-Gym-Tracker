@@ -53,19 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 select.value = sessionState.prog;
                 currentProgramKey = sessionState.prog;
                 
-                // MODIFICATION 1 : Charger les logs AVANT l'interface
+                // 1. On charge l'historique (ce qui est validé) AVANT l'interface
                 if (sessionState.logs) {
                     currentSessionLogs = sessionState.logs;
                 }
                 
-                // Maintenant l'interface se charge en sachant ce qui est validé
+                // 2. On construit l'interface (les boutons validés deviendront noirs et bloqués)
                 chargerInterface(false);
                 
+                // 3. On remplit les chiffres (MÊME si c'est bloqué/validé)
                 if (sessionState.inputs) {
                     Object.keys(sessionState.inputs).forEach(id => {
                         const el = document.getElementById(id);
-                        // On remplit seulement si la case n'est pas bloquée (pas encore validée)
-                        if (el && !el.disabled) el.value = sessionState.inputs[id];
+                        // ICI : On force l'écriture même si le champ est désactivé
+                        if (el) el.value = sessionState.inputs[id];
                     });
                 }
             }
@@ -149,7 +150,7 @@ function chargerInterface(shouldClear = true) {
             // 1. Afficher le Superset
             renderSuperset(zone, exoA, i, exoB, i+1, key); 
             
-            // MODIFICATION 2 : Vérifier si validé pour remettre le bouton NOIR et bloquer
+            // 2. Vérifier si validé pour remettre le bouton NOIR et bloquer
             const isDone = currentSessionLogs.some(log => log.exo === exoA.name || log.exo === exoB.name);
             if(isDone) {
                 const btn = document.getElementById(`btn_finish_${i}`);
@@ -169,7 +170,7 @@ function chargerInterface(shouldClear = true) {
             // 1. Afficher l'exo Normal
             renderNormal(zone, exoA, i, key); 
             
-            // MODIFICATION 2 : Vérifier si validé pour remettre le bouton NOIR et bloquer
+            // 2. Vérifier si validé pour remettre le bouton NOIR et bloquer
             const isDone = currentSessionLogs.some(log => log.exo === exoA.name);
             if(isDone) {
                 const btn = document.getElementById(`btn_finish_${i}`);
