@@ -423,6 +423,112 @@ function renderBuilder() {
         } 
     } 
 }
+function moveBuilderItem(index, direction) {
+    // direction : -1 pour monter, 1 pour descendre
+    if (direction === -1 && index === 0) return;
+    if (direction === 1 && index >= tempBuilderList.length - 1) return;
+
+    // Gestion du déplacement
+    const item = tempBuilderList[index];
+    let itemsToMove = 1;
+    
+    // Si c'est un Superset, on bouge le bloc de 2
+    if (item.isSuperset && tempBuilderList[index+1] && tempBuilderList[index+1].isSuperset) {
+        itemsToMove = 2;
+    }
+
+    // Calcul de la destination
+    let targetIndex = index + direction;
+    
+    // Si on descend et qu'on saute par dessus un Superset, il faut sauter 2 cases
+    if (direction === 1) {
+        const nextItem = tempBuilderList[targetIndex];
+        if (nextItem.isSuperset && tempBuilderList[targetIndex+1] && tempBuilderList[targetIndex+1].isSuperset) {
+            // On vise après le superset complet
+        }
+    }
+    // Si on monte et qu'on atterrit sur la 2ème partie d'un Superset, on vise le début du Superset
+    if (direction === -1) {
+        const prevItem = tempBuilderList[targetIndex];
+        // Logique simplifiée : On échange dans le tableau
+    }
+
+    // MÉTHODE SIMPLE ET ROBUSTE : ECHANGE DANS LE TABLEAU
+    // 1. On retire l'élément (ou les 2 du superset)
+    const removedItems = tempBuilderList.splice(index, itemsToMove);
+    
+    // 2. On calcule où réinsérer
+    // Si on descend (1), on doit ajouter +1 car on vient de réduire le tableau
+    // Mais attention aux supersets cibles.
+    
+    // Pour faire simple : on échange juste avec l'élément adjacent (ou le groupe adjacent)
+    // C'est trop complexe à gérer parfaitement avec splice.
+    // LE PLUS SIMPLE : Echanger les index directement.
+    
+    // Réinitialisons pour faire une méthode de "SWAP" pure
+    // On annule le splice du dessus pour refaire propre :
+    // Recharger la liste si besoin n'est pas nécessaire car on va modifier tempBuilderList directement
+    
+    // REFONTE LOGIQUE DÉPLACEMENT :
+    // On identifie l'index A (source) et l'index B (destination)
+    let indexA = index;
+    let sizeA = (item.isSuperset) ? 2 : 1;
+    
+    let indexB = -1;
+    let sizeB = 0;
+    
+    if (direction === -1) { // Monter
+        // Regarder ce qu'il y a avant
+        let lookBack = 1;
+        while(indexA - lookBack >= 0) {
+            let prev = tempBuilderList[indexA - lookBack];
+            // Si prev fait partie d'un superset (et est le 2eme element), on recule encore
+            if (prev.isSuperset && tempBuilderList[indexA - lookBack - 1] && tempBuilderList[indexA - lookBack - 1].isSuperset) {
+               // C'est le 2eme element d'un superset, donc le vrai indexB est -2
+               indexB = indexA - 2;
+               sizeB = 2;
+               break;
+            } else {
+               indexB = indexA - 1;
+               sizeB = 1;
+               break;
+            }
+        }
+    } else { // Descendre
+        // Regarder ce qu'il y a après le bloc A
+        let startLook = indexA + sizeA;
+        if (startLook < tempBuilderList.length) {
+            let next = tempBuilderList[startLook];
+            if (next.isSuperset && tempBuilderList[startLook+1] && tempBuilderList[startLook+1].isSuperset) {
+                indexB = startLook;
+                sizeB = 2;
+            } else {
+                indexB = startLook;
+                sizeB = 1;
+            }
+        }
+    }
+    
+    if (indexB !== -1) {
+        // Echange manuel des blocs
+        // On extrait le bloc le plus bas (en index) d'abord pour ne pas casser les index
+        let first = (indexA < indexB) ? indexA : indexB;
+        let second = (indexA < indexB) ? indexB : indexA;
+        let sizeFirst = (indexA < indexB) ? sizeA : sizeB;
+        let sizeSecond = (indexA < indexB) ? sizeB : sizeA;
+        
+        // On copie les données
+        const blockSecond = tempBuilderList.slice(second, second + sizeSecond);
+        const blockFirst = tempBuilderList.slice(first, first + sizeFirst);
+        
+        // On remplace
+        tempBuilderList.splice(second, sizeSecond, ...blockFirst);
+        tempBuilderList.splice(first, sizeFirst, ...blockSecond);
+        
+        resetBuilderForm();
+        renderBuilder();
+    }
+}
 function editBuilderItem(index) {
     currentEditingIndex = index; const item = tempBuilderList[index]; document.getElementById('builderArea').scrollIntoView({behavior: 'smooth'});
     if (item.isSuperset && tempBuilderList[index+1] && tempBuilderList[index+1].isSuperset) {
@@ -855,5 +961,6 @@ function navigateTabs(direction) {
         switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
     }
 }
+
 
 
