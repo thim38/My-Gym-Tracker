@@ -741,49 +741,75 @@ function toggleSettings() {
 window.addEventListener('beforeunload', () => { saveCurrentSessionState(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveCurrentSessionState(); });
 
-// --- GESTION DU SWIPE (SLIDE) ---
-let touchStartX = 0;
-let touchStartY = 0;
+// --- GESTION DU SWIPE (AMÉLIORÉE - FLUIDE) ---
+let xDown = null;                                                        
+let yDown = null;
 
-document.addEventListener('touchstart', function(event) {
-    touchStartX = event.changedTouches[0].screenX;
-    touchStartY = event.changedTouches[0].screenY;
-}, false);
+document.addEventListener('touchstart', function(evt) {
+    const firstTouch = evt.touches[0];                                      
+    xDown = firstTouch.clientX;                                      
+    yDown = firstTouch.clientY;                                      
+}, false);                                                                      
 
-document.addEventListener('touchend', function(event) {
-    let touchEndX = event.changedTouches[0].screenX;
-    let touchEndY = event.changedTouches[0].screenY;
-    handleSwipeGesture(touchStartX, touchStartY, touchEndX, touchEndY);
-}, false);
+document.addEventListener('touchmove', function(evt) {
+    if (!xDown || !yDown) {
+        return;
+    }
 
-function handleSwipeGesture(startX, startY, endX, endY) {
-    let xDiff = endX - startX;
-    let yDiff = endY - startY;
+    let xUp = evt.touches[0].clientX;                                    
+    let yUp = evt.touches[0].clientY;
 
-    // On vérifie que le mouvement est horizontal (plus fort en X qu'en Y)
-    // et assez long (> 50px) pour éviter les faux mouvements
+    let xDiff = xDown - xUp;
+    let yDiff = yDown - yUp;
+
+    // Si on bouge plus horizontalement que verticalement...
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+        // ... C'est un SWIPE ! On empêche le navigateur de faire autre chose
+        if (evt.cancelable) {
+            evt.preventDefault(); 
+        }
+    } 
+}, { passive: false }); // <--- Très important pour bloquer le natif
+
+document.addEventListener('touchend', function(evt) {
+    if (!xDown || !yDown) {
+        return;
+    }
+
+    let xUp = evt.changedTouches[0].clientX;                                    
+    let yUp = evt.changedTouches[0].clientY;
+
+    let xDiff = xDown - xUp;
+    let yDiff = yDown - yUp;
+
+    // On vérifie que le mouvement horizontal est clair (> 50px)
+    // et qu'on n'a pas trop scrollé en hauteur en même temps
     if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
         if (xDiff > 0) {
-            // Glissement vers la droite -> Onglet précédent
-            navigateTabs(-1);
+            /* Swipe Gauche -> Suivant */
+            navigateTabs(1); 
         } else {
-            // Glissement vers la gauche -> Onglet suivant
-            navigateTabs(1);
+            /* Swipe Droite -> Précédent */
+            navigateTabs(-1);
         }
     }
-}
+    
+    /* Reset des valeurs */
+    xDown = null;
+    yDown = null;                                             
+}, false);
 
 function navigateTabs(direction) {
     let newIndex = currentTabIndex + direction;
     
-    // Bloquer pour ne pas aller plus loin que le premier ou dernier onglet
+    // Limites (0 = Séance, 1 = Progs, 2 = Historique)
     if (newIndex < 0) return;
     if (newIndex > 2) return;
 
     if (newIndex !== currentTabIndex) {
         const tabsNames = ['seance', 'progs', 'history'];
         const navButtons = document.querySelectorAll('.nav-item');
-        // On simule le clic sur le bouton correspondant
+        // On change l'onglet
         switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
     }
 }
