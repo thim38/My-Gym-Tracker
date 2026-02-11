@@ -3,6 +3,14 @@
 
 /* GENERAL & RESET */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* MODIFICATION ICI : On bloque html et body */
+html, body {
+    height: 100%; /* Force la hauteur max */
+    overscroll-behavior: none; /* LA solution radicale anti-refresh */
+    overflow-x: hidden; /* Empêche le scroll gauche/droite */
+}
+
 body { 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
     background-color: var(--bg-body); 
@@ -11,8 +19,6 @@ body {
     padding: 15px; 
     padding-bottom: 150px; 
     -webkit-font-smoothing: antialiased; 
-    overscroll-behavior-y: none; /* SEULE MODIF : Bloque le rafraichissement pour le swipe */
-    overflow-x: hidden; 
     user-select: none; 
 }
 h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; font-size: 1.4rem; letter-spacing: -0.5px; animation: fadeInDown 0.5s ease; margin-top: 10px; }
@@ -249,6 +255,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .prog-line, .prog-line-superset, .prog-line-superset-b { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 15px; }
 .prog-line-name { flex: 1; white-space: normal !important; text-align: left; overflow: hidden; }
 .prog-line-info { flex-shrink: 0; white-space: nowrap !important; text-align: right; font-weight: bold; }
+
 
 
 
