@@ -602,11 +602,14 @@ function drawWeightChart() {
     
     ctx.clearRect(0, 0, w, h);
     
-    if (DB.weight.length < 2) {
+ if (DB.weight.length < 2) {
         ctx.fillStyle = "#b2bec3";
         ctx.font = "14px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("Ajoutez au moins 2 mesures pour voir le graphique", w/2, h/2);
+        
+        // MODIFICATION ICI : On coupe la phrase en deux lignes pour que ça rentre
+        ctx.fillText("Ajoutez 2 mesures", w/2, h/2 - 10);
+        ctx.fillText("pour voir le graphique", w/2, h/2 + 15);
         return;
     }
     
@@ -784,3 +787,4 @@ function navigateTabs(direction) {
         switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
     }
 }
+
