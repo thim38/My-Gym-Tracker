@@ -4,18 +4,18 @@
 /* GENERAL & RESET */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* BLOCAGE TOTAL DU RAFRAICHISSEMENT (SWIPE) */
+/* RETOUR AU STANDARD (Rafraîchissement autorisé) */
 html, body {
-    height: 100%; /* Force la hauteur max */
-    overscroll-behavior: none; /* LA solution radicale anti-refresh */
-    overflow-x: hidden; /* Empêche le scroll gauche/droite */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Evite juste le scroll horizontal accidentel */
+    /* J'ai enlevé 'overscroll-behavior: none' et 'height: 100%' */
 }
 
 body { 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
     background-color: var(--bg-body); 
     color: var(--text-main); 
-    margin: 0; 
     padding: 15px; 
     padding-bottom: 150px; 
     -webkit-font-smoothing: antialiased; 
@@ -59,16 +59,11 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
 
-/* DATE AJUSTÉE : RETOUR À LA VERSION STABLE (FIXE) */
+/* DATE AJUSTÉE (Fixe pour éviter bug texture) */
 .date-input-styled {
-    border: none; 
-    background: #fff; 
-    padding: 14px;      /* Padding normal */
-    border-radius: 16px; 
-    font-family: inherit; 
-    color: var(--text-gray); 
-    box-shadow: var(--shadow); 
-    width: 135px;       /* Largeur fixe restaurée */
+    border: none; background: #fff; padding: 14px; border-radius: 16px; 
+    font-family: inherit; color: var(--text-gray); box-shadow: var(--shadow); 
+    width: 135px;
 }
 
 .btn-add-weight { background: var(--brand); color: white; border: none; border-radius: 16px; width: 50px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(45, 52, 54, 0.2); }
@@ -79,26 +74,12 @@ canvas { width: 100%; height: 100%; display: block; }
 .weight-date { font-weight: 600; color: #b2bec3; font-size: 0.9rem; }
 .weight-val { font-weight: 800; color: var(--text-main); font-size: 1.1rem; }
 .btn-del-weight {
-    background: #f1f3f5;       /* Gris clair */
-    color: #2d3436;            /* Gris foncé */
-    border: 1px solid #e9ecef; /* Bordure très fine */
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-left: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;             
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: transform 0.1s;
+    background: #f1f3f5; color: #2d3436; border: 1px solid #e9ecef;
+    width: 30px; height: 30px; border-radius: 50%; margin-left: 10px;
+    font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: transform 0.1s;
 }
-
-.btn-del-weight:active {
-    transform: scale(0.9);     
-    background: #e9ecef;
-}
+.btn-del-weight:active { transform: scale(0.9); background: #e9ecef; }
 
 /* --- INPUTS & SELECTS --- */
 select { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid transparent; background: #fff; font-size: 1rem; margin-bottom: 25px; font-weight: 700; outline: none; text-align: center; text-align-last: center; box-shadow: var(--shadow); -webkit-appearance: none; appearance: none; cursor: pointer; transition: transform 0.1s; }
