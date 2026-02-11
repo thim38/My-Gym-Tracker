@@ -368,16 +368,58 @@ function validerSupersetBuilder() {
     resetBuilderForm(); renderBuilder(); document.getElementById('buildExoName').value = ''; document.getElementById('buildExoNameB').value = ''; annulerModeSuperset(); document.getElementById('buildExoName').focus();
 }
 function renderBuilder() { 
-    const listDiv = document.getElementById('builderListDisplay'); listDiv.innerHTML = ''; 
+    const listDiv = document.getElementById('builderListDisplay'); 
+    listDiv.innerHTML = ''; 
+    
     for (let i = 0; i < tempBuilderList.length; i++) { 
-        const item = tempBuilderList[i]; let editingClass = ''; 
+        const item = tempBuilderList[i]; 
+        let editingClass = ''; 
         if (currentEditingIndex !== -1 && (i === currentEditingIndex || (item.isSuperset && i === currentEditingIndex + 1))) editingClass = 'editing-active';
+        
+        // Boutons de déplacement (Flèches)
+        let moveButtons = '<div style="position:absolute; right:40px; top:10px; display:flex; flex-direction:column; gap:5px;">';
+        
+        // Flèche Monter (seulement si ce n'est pas le premier)
+        if (i > 0) {
+            moveButtons += `<button onclick="moveBuilderItem(${i}, -1)" style="background:#f1f3f5; border:none; border-radius:4px; padding:2px 8px; font-size:12px; cursor:pointer;">▲</button>`;
+        }
+        
+        // Flèche Descendre (seulement si ce n'est pas le dernier)
+        // Attention: si c'est un Superset, on saute l'élément suivant pour le check
+        let isLast = (i === tempBuilderList.length - 1);
+        if (item.isSuperset && tempBuilderList[i+1] && tempBuilderList[i+1].isSuperset) {
+            if (i + 1 === tempBuilderList.length - 1) isLast = true;
+        }
+
+        if (!isLast) {
+            moveButtons += `<button onclick="moveBuilderItem(${i}, 1)" style="background:#f1f3f5; border:none; border-radius:4px; padding:2px 8px; font-size:12px; cursor:pointer;">▼</button>`;
+        }
+        moveButtons += '</div>';
+
         if (item.isSuperset && tempBuilderList[i+1] && tempBuilderList[i+1].isSuperset) { 
-            const nextItem = tempBuilderList[i+1]; const dataJson = JSON.stringify({ type: 'superset', dataA: item, dataB: nextItem });
-            listDiv.innerHTML += `<div class="builder-item builder-item-superset ${editingClass}" data-json='${dataJson}'><span class="delete-x" onclick="tempBuilderList.splice(${i}, 2); resetBuilderForm(); renderBuilder()">✖</span><div class="builder-click-zone" onclick="editBuilderItem(${i})" title="Cliquer pour modifier"><div style="margin-bottom:12px;"> <span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span> </div><div> <span class="builder-exo-name">${nextItem.name}</span> <span class="builder-exo-info">${nextItem.sets} x ${nextItem.reps} reps</span> </div></div></div>`; i++; 
+            const nextItem = tempBuilderList[i+1]; 
+            const dataJson = JSON.stringify({ type: 'superset', dataA: item, dataB: nextItem });
+            
+            listDiv.innerHTML += `
+            <div class="builder-item builder-item-superset ${editingClass}" data-json='${dataJson}' style="position:relative; padding-right:70px;">
+                ${moveButtons}
+                <span class="delete-x" onclick="tempBuilderList.splice(${i}, 2); resetBuilderForm(); renderBuilder()">✖</span>
+                <div class="builder-click-zone" onclick="editBuilderItem(${i})" title="Cliquer pour modifier">
+                    <div style="margin-bottom:12px;"> <span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span> </div>
+                    <div> <span class="builder-exo-name">${nextItem.name}</span> <span class="builder-exo-info">${nextItem.sets} x ${nextItem.reps} reps</span> </div>
+                </div>
+            </div>`; 
+            i++; 
         } else { 
             const dataJson = JSON.stringify({ type: 'solo', data: item });
-            listDiv.innerHTML += `<div class="builder-item builder-item-solo ${editingClass}" data-json='${dataJson}'><span class="delete-x" onclick="tempBuilderList.splice(${i}, 1); resetBuilderForm(); renderBuilder()">✖</span><div class="builder-click-zone" onclick="editBuilderItem(${i})" title="Cliquer pour modifier"><span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span></div></div>`; 
+            listDiv.innerHTML += `
+            <div class="builder-item builder-item-solo ${editingClass}" data-json='${dataJson}' style="position:relative; padding-right:70px;">
+                ${moveButtons}
+                <span class="delete-x" onclick="tempBuilderList.splice(${i}, 1); resetBuilderForm(); renderBuilder()">✖</span>
+                <div class="builder-click-zone" onclick="editBuilderItem(${i})" title="Cliquer pour modifier">
+                    <span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span>
+                </div>
+            </div>`; 
         } 
     } 
 }
@@ -813,4 +855,5 @@ function navigateTabs(direction) {
         switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
     }
 }
+
 
