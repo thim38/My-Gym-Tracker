@@ -367,6 +367,14 @@ function validerSupersetBuilder() {
     if (currentEditingIndex > -1) { tempBuilderList[currentEditingIndex] = exoA; tempBuilderList[currentEditingIndex+1] = exoB; } else { tempBuilderList.push(exoA); tempBuilderList.push(exoB); }
     resetBuilderForm(); renderBuilder(); document.getElementById('buildExoName').value = ''; document.getElementById('buildExoNameB').value = ''; annulerModeSuperset(); document.getElementById('buildExoName').focus();
 }
+
+// --- VARIABLES POUR LE DRAG & DROP ---
+let dragSrcIndex = -1;
+let dragOverIndex = -1;
+let longPressTimer = null;
+let isDraggingMode = false;
+
+// --- FONCTION RENDER BUILDER AVEC DRAG & DROP (SANS FLÈCHES) ---
 function renderBuilder() { 
     const listDiv = document.getElementById('builderListDisplay'); 
     listDiv.innerHTML = ''; 
@@ -376,169 +384,135 @@ function renderBuilder() {
         let editingClass = ''; 
         if (currentEditingIndex !== -1 && (i === currentEditingIndex || (item.isSuperset && i === currentEditingIndex + 1))) editingClass = 'editing-active';
         
-        // --- PRÉPARATION DES BOUTONS ---
-        let buttonsHtml = '<div class="builder-actions-group">';
-        
-        // 1. Bouton MONTER (▲) - Sauf si c'est le premier
-        if (i > 0) {
-            buttonsHtml += `<button class="btn-builder-action btn-move-up" onclick="event.stopPropagation(); moveBuilderItem(${i}, -1)">▲</button>`;
-        } else {
-            // Espace vide pour garder l'alignement si pas de bouton monter
-            buttonsHtml += `<div style="width:32px; height:32px;"></div>`;
-        }
+        let htmlContent = '';
+        let isSupersetStart = (item.isSuperset && tempBuilderList[i+1] && tempBuilderList[i+1].isSuperset);
+        let isSupersetSecond = (item.isSuperset && tempBuilderList[i-1] && tempBuilderList[i-1].isSuperset);
 
-        // Vérif si c'est le dernier pour le bouton descendre
-        let isLast = (i === tempBuilderList.length - 1);
-        if (item.isSuperset && tempBuilderList[i+1] && tempBuilderList[i+1].isSuperset) {
-            if (i + 1 === tempBuilderList.length - 1) isLast = true;
-        }
+        // Si c'est la 2ème partie d'un superset, on ne peut pas le "draguer" seul, il suit le premier.
+        // Donc on met l'attribut draggable uniquement sur le 1er ou les solos.
+        let draggableAttr = isSupersetSecond ? '' : 'data-draggable="true"';
 
-        // 2. Bouton DESCENDRE (▼) - Sauf si c'est le dernier
-        if (!isLast) {
-            buttonsHtml += `<button class="btn-builder-action btn-move-down" onclick="event.stopPropagation(); moveBuilderItem(${i}, 1)">▼</button>`;
-        } else {
-            buttonsHtml += `<div style="width:32px; height:32px;"></div>`;
-        }
-
-        // 3. Bouton SUPPRIMER (✖) - Toujours là
-        // Si Superset, on supprime 2 items, sinon 1
-        const deleteCount = (item.isSuperset) ? 2 : 1;
-        buttonsHtml += `<button class="btn-builder-action btn-delete-item" onclick="event.stopPropagation(); tempBuilderList.splice(${i}, ${deleteCount}); resetBuilderForm(); renderBuilder()">✖</button>`;
-        
-        buttonsHtml += '</div>';
-        // -------------------------------
-
-        if (item.isSuperset && tempBuilderList[i+1] && tempBuilderList[i+1].isSuperset) { 
+        if (isSupersetStart) { 
             const nextItem = tempBuilderList[i+1]; 
             const dataJson = JSON.stringify({ type: 'superset', dataA: item, dataB: nextItem });
             
-            listDiv.innerHTML += `
-            <div class="builder-item builder-item-superset ${editingClass}" data-json='${dataJson}'>
-                <div class="builder-click-zone" onclick="editBuilderItem(${i})" style="width:100%">
+            htmlContent = `
+            <div class="builder-item builder-item-superset ${editingClass}" 
+                 data-index="${i}" ${draggableAttr} data-json='${dataJson}'>
+                <span class="delete-x" onclick="event.stopPropagation(); tempBuilderList.splice(${i}, 2); resetBuilderForm(); renderBuilder()">✖</span>
+                <div class="builder-click-zone" onclick="editBuilderItem(${i})">
                     <div style="margin-bottom:8px;"> <span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span> </div>
                     <div> <span class="builder-exo-name">${nextItem.name}</span> <span class="builder-exo-info">${nextItem.sets} x ${nextItem.reps} reps</span> </div>
                 </div>
-                ${buttonsHtml}
+                <div style="margin-top:5px; font-size:10px; color:#b2bec3; font-weight:bold; letter-spacing:1px; text-align:center;">SUPERSET (Maintenir pour déplacer)</div>
             </div>`; 
             i++; 
-        } else { 
+        } else if (!isSupersetSecond) { 
             const dataJson = JSON.stringify({ type: 'solo', data: item });
-            listDiv.innerHTML += `
-            <div class="builder-item builder-item-solo ${editingClass}" data-json='${dataJson}'>
-                <div class="builder-click-zone" onclick="editBuilderItem(${i})" style="width:100%">
+            htmlContent = `
+            <div class="builder-item builder-item-solo ${editingClass}" 
+                 data-index="${i}" ${draggableAttr} data-json='${dataJson}'>
+                <span class="delete-x" onclick="event.stopPropagation(); tempBuilderList.splice(${i}, 1); resetBuilderForm(); renderBuilder()">✖</span>
+                <div class="builder-click-zone" onclick="editBuilderItem(${i})">
                     <span class="builder-exo-name">${item.name}</span> <span class="builder-exo-info">${item.sets} x ${item.reps} reps</span>
                 </div>
-                ${buttonsHtml}
             </div>`; 
         } 
+        listDiv.innerHTML += htmlContent;
     } 
-}
-function moveBuilderItem(index, direction) {
-    // direction : -1 pour monter, 1 pour descendre
-    if (direction === -1 && index === 0) return;
-    if (direction === 1 && index >= tempBuilderList.length - 1) return;
 
-    // Gestion du déplacement
-    const item = tempBuilderList[index];
-    let itemsToMove = 1;
-    
-    // Si c'est un Superset, on bouge le bloc de 2
-    if (item.isSuperset && tempBuilderList[index+1] && tempBuilderList[index+1].isSuperset) {
-        itemsToMove = 2;
-    }
+    // --- AJOUT DES ÉCOUTEURS TACTILES (DRAG & DROP) ---
+    const items = listDiv.querySelectorAll('.builder-item[data-draggable="true"]');
+    items.forEach(el => {
+        // 1. TOUCH START : On lance le chrono pour détecter le maintien
+        el.addEventListener('touchstart', (e) => {
+            if (e.target.classList.contains('delete-x')) return; // Ignore la croix
+            
+            dragSrcIndex = parseInt(el.getAttribute('data-index'));
+            isDraggingMode = false; // Reset
 
-    // Calcul de la destination
-    let targetIndex = index + direction;
-    
-    // Si on descend et qu'on saute par dessus un Superset, il faut sauter 2 cases
-    if (direction === 1) {
-        const nextItem = tempBuilderList[targetIndex];
-        if (nextItem.isSuperset && tempBuilderList[targetIndex+1] && tempBuilderList[targetIndex+1].isSuperset) {
-            // On vise après le superset complet
-        }
-    }
-    // Si on monte et qu'on atterrit sur la 2ème partie d'un Superset, on vise le début du Superset
-    if (direction === -1) {
-        const prevItem = tempBuilderList[targetIndex];
-        // Logique simplifiée : On échange dans le tableau
-    }
+            // Si on maintient 500ms, le mode drag s'active
+            longPressTimer = setTimeout(() => {
+                isDraggingMode = true;
+                el.classList.add('dragging-active');
+                // Vibration haptique si dispo sur le tel
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 500);
+        }, { passive: false });
 
-    // MÉTHODE SIMPLE ET ROBUSTE : ECHANGE DANS LE TABLEAU
-    // 1. On retire l'élément (ou les 2 du superset)
-    const removedItems = tempBuilderList.splice(index, itemsToMove);
-    
-    // 2. On calcule où réinsérer
-    // Si on descend (1), on doit ajouter +1 car on vient de réduire le tableau
-    // Mais attention aux supersets cibles.
-    
-    // Pour faire simple : on échange juste avec l'élément adjacent (ou le groupe adjacent)
-    // C'est trop complexe à gérer parfaitement avec splice.
-    // LE PLUS SIMPLE : Echanger les index directement.
-    
-    // Réinitialisons pour faire une méthode de "SWAP" pure
-    // On annule le splice du dessus pour refaire propre :
-    // Recharger la liste si besoin n'est pas nécessaire car on va modifier tempBuilderList directement
-    
-    // REFONTE LOGIQUE DÉPLACEMENT :
-    // On identifie l'index A (source) et l'index B (destination)
-    let indexA = index;
-    let sizeA = (item.isSuperset) ? 2 : 1;
-    
-    let indexB = -1;
-    let sizeB = 0;
-    
-    if (direction === -1) { // Monter
-        // Regarder ce qu'il y a avant
-        let lookBack = 1;
-        while(indexA - lookBack >= 0) {
-            let prev = tempBuilderList[indexA - lookBack];
-            // Si prev fait partie d'un superset (et est le 2eme element), on recule encore
-            if (prev.isSuperset && tempBuilderList[indexA - lookBack - 1] && tempBuilderList[indexA - lookBack - 1].isSuperset) {
-               // C'est le 2eme element d'un superset, donc le vrai indexB est -2
-               indexB = indexA - 2;
-               sizeB = 2;
-               break;
-            } else {
-               indexB = indexA - 1;
-               sizeB = 1;
-               break;
+        // 2. TOUCH MOVE : Si le mode drag est actif, on suit le doigt
+        el.addEventListener('touchmove', (e) => {
+            if (!isDraggingMode) {
+                // Si on bouge le doigt AVANT les 500ms, c'est un scroll, on annule le timer
+                clearTimeout(longPressTimer);
+                return;
             }
-        }
-    } else { // Descendre
-        // Regarder ce qu'il y a après le bloc A
-        let startLook = indexA + sizeA;
-        if (startLook < tempBuilderList.length) {
-            let next = tempBuilderList[startLook];
-            if (next.isSuperset && tempBuilderList[startLook+1] && tempBuilderList[startLook+1].isSuperset) {
-                indexB = startLook;
-                sizeB = 2;
-            } else {
-                indexB = startLook;
-                sizeB = 1;
+
+            // Sinon, c'est un drag : on bloque le scroll de la page
+            e.preventDefault(); 
+
+            // On regarde sur quel élément on passe
+            const touch = e.touches[0];
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            const closestItem = targetEl ? targetEl.closest('.builder-item') : null;
+
+            // Nettoyage visuel des anciens "over"
+            document.querySelectorAll('.drag-over').forEach(i => i.classList.remove('drag-over'));
+
+            if (closestItem && closestItem !== el) {
+                closestItem.classList.add('drag-over');
+                dragOverIndex = parseInt(closestItem.getAttribute('data-index'));
             }
-        }
-    }
-    
-    if (indexB !== -1) {
-        // Echange manuel des blocs
-        // On extrait le bloc le plus bas (en index) d'abord pour ne pas casser les index
-        let first = (indexA < indexB) ? indexA : indexB;
-        let second = (indexA < indexB) ? indexB : indexA;
-        let sizeFirst = (indexA < indexB) ? sizeA : sizeB;
-        let sizeSecond = (indexA < indexB) ? sizeB : sizeA;
-        
-        // On copie les données
-        const blockSecond = tempBuilderList.slice(second, second + sizeSecond);
-        const blockFirst = tempBuilderList.slice(first, first + sizeFirst);
-        
-        // On remplace
-        tempBuilderList.splice(second, sizeSecond, ...blockFirst);
-        tempBuilderList.splice(first, sizeFirst, ...blockSecond);
-        
-        resetBuilderForm();
-        renderBuilder();
-    }
+        }, { passive: false });
+
+        // 3. TOUCH END : On lâche tout
+        el.addEventListener('touchend', (e) => {
+            clearTimeout(longPressTimer);
+            el.classList.remove('dragging-active');
+            document.querySelectorAll('.drag-over').forEach(i => i.classList.remove('drag-over'));
+
+            if (isDraggingMode && dragOverIndex !== -1 && dragSrcIndex !== -1 && dragSrcIndex !== dragOverIndex) {
+                // --- LOGIQUE D'ÉCHANGE ---
+                handleDropLogic(dragSrcIndex, dragOverIndex);
+            }
+            
+            // Reset
+            isDraggingMode = false;
+            dragSrcIndex = -1;
+            dragOverIndex = -1;
+        });
+    });
 }
+
+// Fonction auxiliaire pour gérer l'échange dans le tableau
+function handleDropLogic(fromIndex, toIndex) {
+    // 1. Identifier la taille du bloc déplacé (1 ou 2 si superset)
+    let itemA = tempBuilderList[fromIndex];
+    let isSupersetA = (itemA.isSuperset && tempBuilderList[fromIndex+1] && tempBuilderList[fromIndex+1].isSuperset);
+    let sizeA = isSupersetA ? 2 : 1;
+
+    // 2. Extraire le bloc A
+    // Attention : si on déplace de bas en haut ou haut en bas, l'index change après splice
+    
+    // On copie les éléments à bouger
+    let movingItems = tempBuilderList.slice(fromIndex, fromIndex + sizeA);
+    
+    // On les supprime du tableau
+    tempBuilderList.splice(fromIndex, sizeA);
+    
+    // Si on a supprimé AVANT la destination, l'index de destination a reculé
+    let adjust = (fromIndex < toIndex) ? -sizeA : 0;
+    let finalDest = toIndex + adjust;
+    
+    // Sécurité
+    if (finalDest < 0) finalDest = 0;
+    
+    // On insère au nouvel endroit
+    tempBuilderList.splice(finalDest, 0, ...movingItems);
+    
+    renderBuilder();
+}
+
 function editBuilderItem(index) {
     currentEditingIndex = index; const item = tempBuilderList[index]; document.getElementById('builderArea').scrollIntoView({behavior: 'smooth'});
     if (item.isSuperset && tempBuilderList[index+1] && tempBuilderList[index+1].isSuperset) {
@@ -971,7 +945,3 @@ function navigateTabs(direction) {
         switchTab(tabsNames[newIndex], navButtons[newIndex], newIndex);
     }
 }
-
-
-
-
