@@ -52,11 +52,18 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
-/* DATE AJUSTÉE */
+/* DATE AJUSTÉE : Elle prend la place dispo et réduit un peu le padding */
 .date-input-styled {
-    border: none; background: #fff; padding: 14px; border-radius: 16px; 
-    font-family: inherit; color: var(--text-gray); box-shadow: var(--shadow); 
-    width: 135px; /* AJUSTEMENT TAILLE DATE */
+    border: none; 
+    background: #fff; 
+    padding: 14px 5px; /* On réduit l'espace sur les côtés pour laisser la date s'afficher */
+    border-radius: 16px; 
+    font-family: inherit; 
+    color: var(--text-gray); 
+    box-shadow: var(--shadow); 
+    flex: 1.2; /* L'astuce est là : ça lui donne plus de place qu'au poids */
+    min-width: 0; /* Sécurité pour ne pas déborder */
+    text-align: center;
 }
 .btn-add-weight { background: var(--brand); color: white; border: none; border-radius: 16px; width: 50px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(45, 52, 54, 0.2); }
 .btn-add-weight:active { transform: scale(0.95); }
@@ -242,6 +249,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .prog-line, .prog-line-superset, .prog-line-superset-b { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 15px; }
 .prog-line-name { flex: 1; white-space: normal !important; text-align: left; overflow: hidden; }
 .prog-line-info { flex-shrink: 0; white-space: nowrap !important; text-align: right; font-weight: bold; }
+
 
 
 
