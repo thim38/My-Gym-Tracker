@@ -136,11 +136,30 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 10px; text-align: center; }
 .cal-weekday { font-size: 0.8rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+
+/* Case de base */
 .cal-day { aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-weight: 600; font-size: 0.9rem; position: relative; background: #f8f9fa; color: #b2bec3; border: 2px solid transparent; }
+
+/* Case du mois en cours */
 .cal-day.active-month { background: #fff; color: var(--text-main); border-color: #f1f3f5; }
-.cal-day.selected { background: #dfe6e9 !important; color: var(--text-main) !important; border-color: #b2bec3 !important; }
-.cal-day.has-session::after { content: ''; width: 6px; height: 6px; background: var(--brand); border-radius: 50%; position: absolute; bottom: 6px; transition: 0.2s; }
-.cal-day.today { border: 2px solid var(--brand) !important; color: var(--text-main) !important; }
+
+/* MODIFICATION ICI : Style pour un jour AVEC séance (Fond gris au lieu du point) */
+.cal-day.has-session {
+    background-color: #e2e6ea !important; /* Gris bien visible */
+    color: var(--text-main) !important;
+    font-weight: 800; /* On met le chiffre en gras */
+    border-color: #dee2e6 !important;
+}
+
+/* On supprime l'ancien petit point noir */
+.cal-day.has-session::after { display: none !important; }
+
+/* Case sélectionnée (quand tu cliques dessus) */
+.cal-day.selected { background: #2d3436 !important; color: #fff !important; border-color: #2d3436 !important; }
+
+/* Case d'aujourd'hui (Bordure noire) */
+.cal-day.today { border: 2px solid var(--brand) !important; }
+
 .session-item-detail { background: #fff; padding: 15px; border-radius: 16px; margin-bottom: 10px; border-left: 8px solid #ced4da; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; animation: fadeInUp 0.3s ease; border: 1px solid var(--border-light); }
 .session-item-detail span { font-weight: 700; color: var(--text-main); }
 
@@ -223,5 +242,6 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .prog-line, .prog-line-superset, .prog-line-superset-b { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 15px; }
 .prog-line-name { flex: 1; white-space: normal !important; text-align: left; overflow: hidden; }
 .prog-line-info { flex-shrink: 0; white-space: nowrap !important; text-align: right; font-weight: bold; }
+
 
 
