@@ -63,15 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 2. On construit l'interface de base
                 chargerInterface(false);
                 
-                // 3. RESTAURATION DES DROP SETS (CORRECTIF)
+                // 3. RESTAURATION DES DROP SETS
                 if (sessionState.inputs) {
-                    // On cherche les inputs de type 'drop_w_...' pour savoir où recréer des lignes
                     const dropMap = {};
                     Object.keys(sessionState.inputs).forEach(key => {
                         if (key.startsWith('drop_w_')) {
-                            // Format: drop_w_{idx}_{set}_{dropIndex}
                             const parts = key.split('_'); 
-                            // parts[2] = idx Exo, parts[3] = Num Série, parts[4] = Index Drop
                             const baseId = `${parts[2]}_${parts[3]}`; 
                             const dropIdx = parseInt(parts[4]);
                             
@@ -81,16 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    // On recrée les lignes manquantes
                     Object.keys(dropMap).forEach(baseId => {
-                        const count = dropMap[baseId] + 1; // +1 car l'index commence à 0
+                        const count = dropMap[baseId] + 1; 
                         for(let i=0; i<count; i++) {
-                            // On ajoute la ligne (sans hint pour la restauration simple)
                             ajouterDegressive(baseId, '', '', 0, true);
                         }
                     });
 
-                    // 4. On remplit TOUS les chiffres (Maintenant que les cases existent)
+                    // 4. On remplit TOUS les chiffres
                     Object.keys(sessionState.inputs).forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.value = sessionState.inputs[id];
@@ -226,7 +221,6 @@ function chargerInterface(shouldClear = true) {
 
 function createInputWithUnit(id, unit) { return `<div class="input-wrapper"><input type="number" id="${id}" placeholder="" min="0" oninput="if(this.value!=='')this.value=Math.abs(this.value)"><span class="unit-label">${unit}</span></div>`; }
 
-// MODIF: createDropInput prend maintenant un ID
 function createDropInput(id, className, unit) { return `<div class="input-wrapper"><input type="number" id="${id}" class="${className}" placeholder="" min="0" oninput="if(this.value!=='')this.value=Math.abs(this.value)"><span class="unit-label">${unit}</span></div>`; }
 
 function getSplitPerf(exoName, setNum, progName) {
@@ -279,17 +273,14 @@ function renderSuperset(container, exoA, idxA, exoB, idxB, progName) {
     container.innerHTML += html; 
 }
 
-// MODIF: AJOUT D'ID ET LOGIQUE DE RESTAURATION
 function ajouterDegressive(baseId, exoName, progName, setNum, restorationMode = false) { 
     const container = document.getElementById('container_' + baseId); 
-    // On calcule l'index du drop pour créer un ID unique
     const dropIndex = container.querySelectorAll('.drop-row').length;
     const dropWeightId = `drop_w_${baseId}_${dropIndex}`;
     const dropRepsId = `drop_r_${baseId}_${dropIndex}`;
 
     const div = document.createElement('div'); div.className = 'input-row drop-row'; 
     
-    // Si on restaure, on n'affiche pas forcément le hint s'il est vide, mais ici on le garde simple
     let dropHint = '';
     if (!restorationMode) {
         const data = getSplitPerf(exoName, setNum, progName);
@@ -301,8 +292,6 @@ function ajouterDegressive(baseId, exoName, progName, setNum, restorationMode = 
     if(dropHint) div.innerHTML += `<div style="width:100%;">${dropHint}</div>`;
     
     container.appendChild(div); 
-    
-    // Ajout de l'écouteur pour la sauvegarde auto
     div.querySelectorAll('input').forEach(i => i.addEventListener('input', saveCurrentSessionState));
 }
 
@@ -412,13 +401,13 @@ function validerSupersetBuilder() {
     resetBuilderForm(); renderBuilder(); document.getElementById('buildExoName').value = ''; document.getElementById('buildExoNameB').value = ''; annulerModeSuperset(); document.getElementById('buildExoName').focus();
 }
 
-// --- VARIABLES POUR LE DRAG & DROP ---
+// --- VARIABLES POUR LE DRAG & DROP (BUILDER) ---
 let dragSrcIndex = -1;
 let dragOverIndex = -1;
 let longPressTimer = null;
 let isDraggingMode = false;
 
-// --- FONCTION RENDER BUILDER AVEC DRAG & DROP (SANS TEXTE) ---
+// --- FONCTION RENDER BUILDER AVEC DRAG & DROP ---
 function renderBuilder() { 
     const listDiv = document.getElementById('builderListDisplay'); 
     listDiv.innerHTML = ''; 
@@ -462,7 +451,6 @@ function renderBuilder() {
         listDiv.innerHTML += htmlContent;
     } 
 
-    // --- AJOUT DES ÉCOUTEURS TACTILES (DRAG & DROP) ---
     const items = listDiv.querySelectorAll('.builder-item[data-draggable="true"]');
     items.forEach(el => {
         el.addEventListener('touchstart', (e) => {
@@ -518,11 +506,7 @@ function handleDropLogic(fromIndex, toIndex) {
     let movingItems = tempBuilderList.slice(fromIndex, fromIndex + sizeA);
     tempBuilderList.splice(fromIndex, sizeA);
     let adjust = (fromIndex < toIndex) ? -sizeA : 0;
-    
-    // FIX : On compense pour que le drop soit plus intuitif
-    // Si on descend, on veut insérer APRES l'élément visé
     if (fromIndex < toIndex) adjust = 0; 
-    
     let finalDest = toIndex + adjust;
     if (finalDest < 0) finalDest = 0;
     tempBuilderList.splice(finalDest, 0, ...movingItems);
@@ -549,13 +533,147 @@ function sauvegarderProgrammeFinal() {
 function startEditProgram(btn, e) { e.stopPropagation(); const name = btn.getAttribute('data-name'); resetBuilderForm(); tempBuilderList = JSON.parse(JSON.stringify(DB.progs[name])); document.getElementById('newProgName').value = name; document.getElementById('builderArea').classList.remove('hidden'); renderBuilder(); document.getElementById('builderArea').scrollIntoView({behavior: 'smooth'}); document.getElementById('btnSaveProg').innerText = "Mettre à jour la Séance"; }
 function deleteProg(name, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete DB.progs[name]; localStorage.setItem('gym_v8_progs', JSON.stringify(DB.progs)); updateSelectMenu(); renderProgramList(); chargerInterface(); } }
 function updateSelectMenu() { const s = document.getElementById('selectProgram'); s.innerHTML = '<option value="" disabled selected>Choisir une Séance</option>'; Object.keys(DB.progs).forEach(k => s.innerHTML += `<option value="${k}">${k}</option>`); }
+
+// --- MODIF: VARIABLES DRAG & DROP PROGRAMMES ---
+let progDragSrcIndex = -1;
+let progDragOverIndex = -1;
+let progLongPressTimer = null;
+let isProgDraggingMode = false;
+
+// --- MODIF: FONCTION RENDER PROGRAMMES AVEC DRAG & DROP ---
 function renderProgramList() { 
-    const div = document.getElementById('listeMesProgrammes'); div.innerHTML = ''; 
-    Object.keys(DB.progs).forEach(k => { 
-        let html = ` <div class="prog-item" onclick="toggleDetails('${k}')"> <span class="prog-title">${k}</span> <div class="prog-header-actions"><button class="btn-edit" data-name="${k}" onclick="startEditProgram(this, event)">Modifier</button><button class="btn-danger" onclick="deleteProg('${k.replace(/'/g, "\\'")}', event)">Supprimer</button></div> </div> <div id="details-${k}" class="prog-details-box">`; 
-        const exos = DB.progs[k]; for (let i = 0; i < exos.length; i++) { const e = exos[i]; if (e.isSuperset && exos[i+1] && exos[i+1].isSuperset) { const eNext = exos[i+1]; html += `<div class="superset-wrapper"> <div class="prog-line prog-line-superset"> <span class="prog-line-name">${e.name}</span> <span class="prog-line-info">${e.sets} x ${e.reps} reps</span> </div> <div class="prog-line prog-line-superset prog-line-superset-b"> <span class="prog-line-name">${eNext.name}</span> <span class="prog-line-info">${eNext.sets} x ${eNext.reps} reps</span> </div></div>`; i++; } else { html += `<div class="exo-wrapper"> <div class="prog-line"> <span class="prog-line-name">${e.name}</span> <span class="prog-line-info">${e.sets} x ${e.reps} reps</span> </div> </div>`; } } html += `</div>`; div.innerHTML += html; 
-    }); 
+    const div = document.getElementById('listeMesProgrammes'); 
+    div.innerHTML = ''; 
+    
+    // On récupère les clés (noms des programmes)
+    const progKeys = Object.keys(DB.progs);
+
+    progKeys.forEach((k, index) => { 
+        let html = ` 
+        <div class="prog-item" data-index="${index}" onclick="toggleDetails('${k}')"> 
+            <div style="flex:1">
+                <span class="prog-title">${k}</span> 
+            </div>
+            <div class="prog-header-actions">
+                <button class="btn-edit" data-name="${k}" onclick="startEditProgram(this, event)">Modifier</button>
+                <button class="btn-danger" onclick="deleteProg('${k.replace(/'/g, "\\'")}', event)">Supprimer</button>
+            </div> 
+        </div> 
+        <div id="details-${k}" class="prog-details-box">`; 
+        
+        const exos = DB.progs[k]; 
+        for (let i = 0; i < exos.length; i++) { 
+            const e = exos[i]; 
+            if (e.isSuperset && exos[i+1] && exos[i+1].isSuperset) { 
+                const eNext = exos[i+1]; 
+                html += `<div class="superset-wrapper"> <div class="prog-line prog-line-superset"> <span class="prog-line-name">${e.name}</span> <span class="prog-line-info">${e.sets} x ${e.reps} reps</span> </div> <div class="prog-line prog-line-superset prog-line-superset-b"> <span class="prog-line-name">${eNext.name}</span> <span class="prog-line-info">${eNext.sets} x ${eNext.reps} reps</span> </div></div>`; 
+                i++; 
+            } else { 
+                html += `<div class="exo-wrapper"> <div class="prog-line"> <span class="prog-line-name">${e.name}</span> <span class="prog-line-info">${e.sets} x ${e.reps} reps</span> </div> </div>`; 
+            } 
+        } 
+        html += `</div>`; 
+        div.innerHTML += html; 
+    });
+
+    // --- AJOUT ECOUTEURS TACTILES POUR PROGRAMMES ---
+    const items = div.querySelectorAll('.prog-item');
+    items.forEach(el => {
+        // 1. TOUCH START
+        el.addEventListener('touchstart', (e) => {
+            // Si on touche un bouton, on ne lance pas le drag
+            if (e.target.tagName === 'BUTTON') return;
+
+            progDragSrcIndex = parseInt(el.getAttribute('data-index'));
+            isProgDraggingMode = false;
+
+            progLongPressTimer = setTimeout(() => {
+                isProgDraggingMode = true;
+                el.classList.add('dragging-active');
+                // On applique le style inline au cas où le CSS ne serait pas à jour
+                el.style.opacity = '0.9';
+                el.style.backgroundColor = '#e9ecef';
+                el.style.transform = 'scale(1.03)';
+                el.style.zIndex = '100';
+                el.style.pointerEvents = 'none'; // Crucial pour détecter l'élément dessous
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 500); 
+        }, { passive: false });
+
+        // 2. TOUCH MOVE
+        el.addEventListener('touchmove', (e) => {
+            if (!isProgDraggingMode) {
+                clearTimeout(progLongPressTimer);
+                return;
+            }
+            e.preventDefault(); 
+            
+            const touch = e.touches[0];
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            const closestItem = targetEl ? targetEl.closest('.prog-item') : null;
+
+            div.querySelectorAll('.drag-over').forEach(i => {
+                i.classList.remove('drag-over');
+                i.style.border = ''; // Clean inline style
+            });
+
+            if (closestItem && closestItem !== el) {
+                closestItem.classList.add('drag-over');
+                // Style inline de fallback
+                closestItem.style.border = '2px dashed #b2bec3';
+                progDragOverIndex = parseInt(closestItem.getAttribute('data-index'));
+            }
+        }, { passive: false });
+
+        // 3. TOUCH END
+        el.addEventListener('touchend', (e) => {
+            clearTimeout(progLongPressTimer);
+            el.classList.remove('dragging-active');
+            // Clean inline styles
+            el.style.opacity = '';
+            el.style.backgroundColor = '';
+            el.style.transform = '';
+            el.style.zIndex = '';
+            el.style.pointerEvents = '';
+
+            div.querySelectorAll('.drag-over').forEach(i => {
+                i.classList.remove('drag-over');
+                i.style.border = '';
+            });
+
+            if (isProgDraggingMode && progDragOverIndex !== -1 && progDragSrcIndex !== -1 && progDragSrcIndex !== progDragOverIndex) {
+                handleProgramDrop(progDragSrcIndex, progDragOverIndex);
+            }
+            
+            isProgDraggingMode = false;
+            progDragSrcIndex = -1;
+            progDragOverIndex = -1;
+        });
+    });
 }
+
+function handleProgramDrop(fromIndex, toIndex) {
+    const keys = Object.keys(DB.progs);
+    const movedKey = keys[fromIndex];
+    
+    // On déplace la clé dans le tableau
+    keys.splice(fromIndex, 1);
+    keys.splice(toIndex, 0, movedKey);
+    
+    // On reconstruit un NOUVEL objet avec le bon ordre
+    const newProgs = {};
+    keys.forEach(key => {
+        newProgs[key] = DB.progs[key];
+    });
+    
+    // On remplace et sauvegarde
+    DB.progs = newProgs;
+    localStorage.setItem('gym_v8_progs', JSON.stringify(DB.progs));
+    
+    updateSelectMenu();
+    renderProgramList();
+}
+
 function toggleDetails(id) { document.getElementById('details-'+id).classList.toggle('open'); }
 
 // --- NOUVELLE LOGIQUE HISTORIQUE (SWITCH) ---
@@ -910,4 +1028,3 @@ document.addEventListener('focusout', function(e) {
         }, 100);
     }
 });
-
