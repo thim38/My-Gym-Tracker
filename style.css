@@ -58,8 +58,7 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
 
-/* --- DATE SUIVI POIDS (CORRECTION) --- */
-
+/* DATE AJUSTÉE (CORRIGÉE : Largeur Fixe + Sans icône calendrier) */
 .date-input-styled {
     border: none; 
     background: #fff; 
@@ -68,13 +67,11 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
     font-family: inherit; 
     color: var(--text-gray); 
     box-shadow: var(--shadow); 
-    width: 135px; /* Largeur fixe conservée */
-    text-align: center; /* On centre bien le texte */
-    appearance: none; /* Nettoyage style natif */
+    width: 135px; /* Largeur fixe comme avant */
+    text-align: center;
+    appearance: none;
 }
-
-/* SUPPRESSION DE L'ICÔNE CALENDRIER NATIVE */
-/* Cela libère de la place pour que la date "12/02/2026" rentre parfaitement */
+/* Cache l'icône calendrier moche */
 .date-input-styled::-webkit-calendar-picker-indicator {
     display: none !important;
     -webkit-appearance: none !important;
@@ -222,8 +219,18 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     
     z-index: 1000 !important;     
     padding-bottom: 0 !important;
+    
+    /* MODIFICATION : Transition fluide pour le scroll */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease !important;
 }
-.nav-bar.scroll-hidden { transform: translateY(150%) !important; opacity: 0; pointer-events: none; }
+
+/* La barre disparaît vers le bas proprement */
+.nav-bar.scroll-hidden { 
+    transform: translateY(150%) !important; 
+    opacity: 0 !important;
+    pointer-events: none !important; /* Pour ne pas cliquer dessus quand cachée */
+}
+
 .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
 .nav-item.active { color: var(--text-main); transform: scale(1.1); }
 
@@ -295,13 +302,11 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .builder-exo-name { display: block; font-weight: 800; font-size: 1rem; color: #2d3436; margin-bottom: 4px; }
 .builder-exo-info { display: block; font-size: 0.85rem; font-weight: 600; color: #636e72; }
 
-/* Style Superset (SANS la ligne grise à gauche) */
+/* Style Superset SANS bordure gauche */
 .builder-item-superset {
-    border-left: none !important; /* C'est cette ligne qui enlève le trait */
-    background-color: #f8f9fa;    /* On garde le fond gris clair pour que ça se distingue */
+    border-left: none !important;
+    background-color: #f8f9fa;
 }
 
 /* Sécurité pour cacher les anciens groupes de boutons s'ils traînent */
 .builder-actions-group { display: none !important; }
-
-
