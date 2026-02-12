@@ -888,3 +888,26 @@ function toggleSettings() {
 // --- SÉCURITÉS ---
 window.addEventListener('beforeunload', () => { saveCurrentSessionState(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveCurrentSessionState(); });
+
+// --- GESTION CLAVIER (Cacher Nav Bar) ---
+// Détecte quand on clique dans un champ (Focus) pour cacher la barre
+document.addEventListener('focusin', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        const nav = document.querySelector('.nav-bar');
+        if (nav) nav.classList.add('keyboard-active');
+    }
+});
+
+// Détecte quand on quitte le champ (Blur) pour réafficher la barre
+document.addEventListener('focusout', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        const nav = document.querySelector('.nav-bar');
+        // Petit délai pour vérifier si on n'a pas juste cliqué sur l'input d'à côté
+        setTimeout(() => {
+            if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                if (nav) nav.classList.remove('keyboard-active');
+            }
+        }, 100);
+    }
+});
+
