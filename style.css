@@ -310,3 +310,12 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 
 /* Sécurité pour cacher les anciens groupes de boutons s'ils traînent */
 .builder-actions-group { display: none !important; }
+
+/* --- GESTION CLAVIER (FORCE CACHÉ) --- */
+.nav-bar.keyboard-active {
+    transform: translateY(200%) !important; /* Force la barre vers le bas */
+    opacity: 0 !important;
+    pointer-events: none !important; /* Empêche de cliquer dessus par erreur */
+    transition: transform 0.2s ease-out !important; /* Disparition rapide */
+}
+
