@@ -1024,3 +1024,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// --- FORCE L'AFFICHAGE DE LA NAV BAR AU CLIC HORS INPUT ---
+document.addEventListener('click', function(e) {
+    const nav = document.querySelector('.nav-bar');
+    if (!nav) return;
+
+    // Si on ne clique PAS sur un champ de saisie
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        // On retire les classes qui cachent la barre
+        nav.classList.remove('scroll-hidden');
+        nav.classList.remove('keyboard-active');
+    }
+});
