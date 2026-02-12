@@ -1009,4 +1009,31 @@ document.addEventListener('focusout', function(e) {
     }
 });
 
+// --- ANIMATION SCROLL (A COLLER TOUT A LA FIN DU FICHIER) ---
+setTimeout(() => {
+    let lastScrollTop = 0;
+    const navBar = document.querySelector('.nav-bar');
+
+    if (navBar) {
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Sécurité pour le rebond en haut de page
+            if (scrollTop <= 0) {
+                navBar.classList.remove('scroll-hidden');
+                lastScrollTop = 0;
+                return;
+            }
+            
+            // Si on descend, on cache. Si on monte, on affiche.
+            if (scrollTop > lastScrollTop && scrollTop > 50) {
+                navBar.classList.add('scroll-hidden');
+            } else {
+                navBar.classList.remove('scroll-hidden');
+            }
+            lastScrollTop = scrollTop;
+        }, { passive: true });
+    }
+}, 1000); // On attend 1 seconde que tout soit chargé pour activer le scroll
+
 
