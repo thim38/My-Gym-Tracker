@@ -58,11 +58,26 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
 
-/* DATE AJUSTÉE (Fixe pour éviter bug texture) */
+/* --- DATE SUIVI POIDS (CORRECTION) --- */
+
 .date-input-styled {
-    border: none; background: #fff; padding: 14px; border-radius: 16px; 
-    font-family: inherit; color: var(--text-gray); box-shadow: var(--shadow); 
-    width: 135px;
+    border: none; 
+    background: #fff; 
+    padding: 14px; 
+    border-radius: 16px; 
+    font-family: inherit; 
+    color: var(--text-gray); 
+    box-shadow: var(--shadow); 
+    width: 135px; /* Largeur fixe conservée */
+    text-align: center; /* On centre bien le texte */
+    appearance: none; /* Nettoyage style natif */
+}
+
+/* SUPPRESSION DE L'ICÔNE CALENDRIER NATIVE */
+/* Cela libère de la place pour que la date "12/02/2026" rentre parfaitement */
+.date-input-styled::-webkit-calendar-picker-indicator {
+    display: none !important;
+    -webkit-appearance: none !important;
 }
 
 .btn-add-weight { background: var(--brand); color: white; border: none; border-radius: 16px; width: 50px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(45, 52, 54, 0.2); }
@@ -288,4 +303,5 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 
 /* Sécurité pour cacher les anciens groupes de boutons s'ils traînent */
 .builder-actions-group { display: none !important; }
+
 
