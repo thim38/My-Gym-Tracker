@@ -911,38 +911,30 @@ function exportData() {
     const dataStr = JSON.stringify(DB);
     
     navigator.clipboard.writeText(dataStr).then(function() {
-        alert("✅ Sauvegarde COPIÉE !\n\nOuvre ton appli 'Notes' (ou Samsung Notes), crée une nouvelle note et fais 'Coller' pour conserver tes données.");
+        alert("Sauvegarde COPIÉE !\n\nOuvre ton appli 'Notes', crée une nouvelle note et fais 'Coller' pour conserver tes données.");
     }, function(err) {
         prompt("Impossible de copier automatiquement. Copie ce texte manuellement et garde-le précieusement :", dataStr);
     });
 }
 
+// --- IMPORTATION DIRECTE PAR COLLER ---
 function triggerImport() {
-    if(confirm("Comment veux-tu importer ?\n\nOK = Choisir un FICHIER (.json)\nANNULER = COLLER du texte")) {
-        document.getElementById('importFile').click();
-    } else {
-        setTimeout(() => {
-            const text = prompt("Colle le texte de ta sauvegarde ici :");
-            if(text) processImport(text);
-        }, 50);
-    }
+    // On attend un tout petit peu pour laisser le temps au menu de se fermer
+    setTimeout(() => {
+        const text = prompt("Colle le texte de ta sauvegarde ici :");
+        if (text && text.trim() !== "") {
+            processImport(text);
+        }
+    }, 100);
 }
 
-function importData(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            processImport(e.target.result);
-        };
-        reader.readAsText(input.files[0]);
-    }
-}
+// Tu peux SUPPRIMER complètement la fonction : function importData(input) { ... }
 
 function processImport(jsonString) {
     try {
         const data = JSON.parse(jsonString);
         if (data.progs || data.history) {
-            if(confirm("⚠️ Attention : Cela va remplacer TOUTES tes données actuelles par cette sauvegarde.\n\nContinuer ?")) {
+            if(confirm("Attention : Cela va remplacer TOUTES tes données actuelles par cette sauvegarde.\n\nContinuer ?")) {
                 DB = {
                     progs: data.progs || {},
                     history: data.history || [],
@@ -952,7 +944,7 @@ function processImport(jsonString) {
                 localStorage.setItem('gym_v21_history', JSON.stringify(DB.history));
                 localStorage.setItem('gym_weight', JSON.stringify(DB.weight));
                 
-                alert("✅ Données restaurées avec succès !");
+                alert("Données restaurées avec succès !");
                 location.reload();
             }
         } else { 
@@ -1036,3 +1028,4 @@ document.addEventListener('click', function(e) {
         nav.classList.remove('keyboard-active');
     }
 });
+
