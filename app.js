@@ -1009,65 +1009,32 @@ document.addEventListener('focusout', function(e) {
     }
 });
 
-// --- ANIMATION SCROLL (A COLLER TOUT A LA FIN DU FICHIER) ---
-setTimeout(() => {
-    let lastScrollTop = 0;
-    const navBar = document.querySelector('.nav-bar');
-
-    if (navBar) {
-        window.addEventListener('scroll', function() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // Sécurité pour le rebond en haut de page
-            if (scrollTop <= 0) {
-                navBar.classList.remove('scroll-hidden');
-                lastScrollTop = 0;
-                return;
-            }
-            
-            // Si on descend, on cache. Si on monte, on affiche.
-            if (scrollTop > lastScrollTop && scrollTop > 50) {
-                navBar.classList.add('scroll-hidden');
-            } else {
-                navBar.classList.remove('scroll-hidden');
-            }
-            lastScrollTop = scrollTop;
-        }, { passive: true });
-    }
-}, 1000); // On attend 1 seconde que tout soit chargé pour activer le scroll
-
-// --- GESTION DU SCROLL (VERSION SÉCURISÉE) ---
-// On attend que toute la page soit chargée pour ne pas bloquer les onglets
+// --- DETECTION SCROLL (A METTRE A LA FIN DU FICHIER) ---
 document.addEventListener('DOMContentLoaded', () => {
-    
     const navBar = document.querySelector('.nav-bar');
     let lastScrollTop = 0;
 
-    // Si la barre existe, on active le scroll
     if (navBar) {
         window.addEventListener('scroll', function() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            // On cherche le scroll partout où il peut se cacher sur Android
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
             
-            // Sécurité : Si on est tout en haut, on affiche toujours
+            // Sécurité rebond haut de page
             if (scrollTop <= 0) {
                 navBar.classList.remove('scroll-hidden');
                 lastScrollTop = 0;
                 return;
             }
 
-            // Si on descend (et qu'on a dépassé 50px), on CACHE
-            if (scrollTop > lastScrollTop && scrollTop > 50) {
-                navBar.classList.add('scroll-hidden');
-            } 
-            // Si on remonte, on AFFICHE
-            else {
-                navBar.classList.remove('scroll-hidden');
+            // Si on descend de plus de 5px
+            if (Math.abs(lastScrollTop - scrollTop) > 5) {
+                if (scrollTop > lastScrollTop && scrollTop > 50) {
+                    navBar.classList.add('scroll-hidden');
+                } else {
+                    navBar.classList.remove('scroll-hidden');
+                }
+                lastScrollTop = scrollTop;
             }
-            
-            lastScrollTop = scrollTop;
         }, { passive: true });
     }
 });
-
-
-
