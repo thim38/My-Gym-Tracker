@@ -1036,4 +1036,38 @@ setTimeout(() => {
     }
 }, 1000); // On attend 1 seconde que tout soit chargé pour activer le scroll
 
+// --- GESTION DU SCROLL (VERSION SÉCURISÉE) ---
+// On attend que toute la page soit chargée pour ne pas bloquer les onglets
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const navBar = document.querySelector('.nav-bar');
+    let lastScrollTop = 0;
+
+    // Si la barre existe, on active le scroll
+    if (navBar) {
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Sécurité : Si on est tout en haut, on affiche toujours
+            if (scrollTop <= 0) {
+                navBar.classList.remove('scroll-hidden');
+                lastScrollTop = 0;
+                return;
+            }
+
+            // Si on descend (et qu'on a dépassé 50px), on CACHE
+            if (scrollTop > lastScrollTop && scrollTop > 50) {
+                navBar.classList.add('scroll-hidden');
+            } 
+            // Si on remonte, on AFFICHE
+            else {
+                navBar.classList.remove('scroll-hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        }, { passive: true });
+    }
+});
+
+
 
