@@ -4,14 +4,14 @@
 /* GENERAL & RESET */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* BLOCAGE TOTAL DU RAFRAICHISSEMENT (Haut -> Bas) */
+/* --- CORRECTIF APK : Blocage du refresh et scroll horizontal --- */
 html, body {
-    overscroll-behavior-y: none !important; 
+    overscroll-behavior-y: none !important; /* Bloque le "pull-to-refresh" */
     overscroll-behavior-x: none !important; 
-    height: 100%;       
-    overflow-x: hidden; 
+    height: 100%;
     margin: 0;
     padding: 0;
+    overflow-x: hidden; 
 }
 
 body { 
@@ -28,7 +28,7 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 .container { max-width: 600px; margin: 0 auto; position: relative; }
 .hidden { display: none !important; }
 
-/* --- AJOUT : PARAMETRES --- */
+/* --- PARAMETRES --- */
 .btn-settings-icon {
     position: absolute; top: 15px; right: 15px;
     background: #fff; border: 1px solid #eee; color: var(--text-main);
@@ -61,7 +61,7 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
 
-/* DATE AJUSTÉE */
+/* DATE AJUSTÉE (Sans icône, largeur fixe) */
 .date-input-styled {
     border: none; background: #fff; padding: 14px; border-radius: 16px; 
     font-family: inherit; color: var(--text-gray); box-shadow: var(--shadow); 
@@ -143,7 +143,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 /* Case du mois en cours */
 .cal-day.active-month { background: #fff; color: var(--text-main); border-color: #f1f3f5; }
 
-/* STYLE JOUR AVEC SÉANCE (GRIS) - On ne touche pas */
+/* STYLE JOUR AVEC SÉANCE (GRIS) */
 .cal-day.has-session { background-color: #e2e6ea !important; color: var(--text-main) !important; font-weight: 800; border-color: #dee2e6 !important; }
 .cal-day.has-session::after { display: none !important; }
 .cal-day.selected { background: #2d3436 !important; color: #fff !important; border-color: #2d3436 !important; }
@@ -220,7 +220,6 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     z-index: 1000 !important;     
     padding-bottom: 0 !important;
     
-    /* Transition fluide scroll & clavier */
     transition: transform 0.3s ease-in-out, opacity 0.3s ease !important;
 }
 
@@ -266,7 +265,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     touch-action: pan-y; 
 }
 
-/* Style quand on déplace (Builder + Programme) */
+/* Style quand on déplace */
 .builder-item.dragging-active, .prog-item.dragging-active {
     opacity: 0.9;
     background-color: #e9ecef !important;
