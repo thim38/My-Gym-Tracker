@@ -1,14 +1,26 @@
+
+/* --- BLOCAGE TOTAL DU REFRESH (Haut -> Bas) --- */
+html, body {
+    /* C'est cette ligne magique qui bloque le rafraîchissement */
+    overscroll-behavior-y: none !important; 
+    
+    /* Celle-ci bloque le retour page précédente (Gauche/Droite) */
+    overscroll-behavior-x: none !important; 
+    
+    height: 100%;       /* Indispensable pour que le blocage fonctionne */
+    overflow-x: hidden; /* Empêche le scroll horizontal */
+    margin: 0;
+    padding: 0;
+}
+
 /* --- VARIABLES --- */
 :root { --bg-body: #f8f9fa; --bg-card: #ffffff; --text-main: #2d3436; --text-gray: #636e72; --border-light: #e9ecef; --input-bg: #f1f3f5; --shadow: 0 2px 12px rgba(0,0,0,0.06); --btn-default-bg: #e9ecef; --btn-default-text: #495057; --brand: #2d3436; --accent: #2d3436; }
 
 /* GENERAL & RESET */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* --- CORRECTIF APK : Blocage du refresh et scroll horizontal --- */
+/* RETOUR AU STANDARD (Rafraîchissement autorisé) */
 html, body {
-    overscroll-behavior-y: none !important; /* Bloque le "pull-to-refresh" */
-    overscroll-behavior-x: none !important; 
-    height: 100%;
     margin: 0;
     padding: 0;
     overflow-x: hidden; 
@@ -28,7 +40,7 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 .container { max-width: 600px; margin: 0 auto; position: relative; }
 .hidden { display: none !important; }
 
-/* --- PARAMETRES --- */
+/* --- AJOUT : PARAMETRES --- */
 .btn-settings-icon {
     position: absolute; top: 15px; right: 15px;
     background: #fff; border: 1px solid #eee; color: var(--text-main);
@@ -61,12 +73,20 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
 
-/* DATE AJUSTÉE (Sans icône, largeur fixe) */
+/* DATE AJUSTÉE (CORRIGÉE : Largeur Fixe + Sans icône calendrier) */
 .date-input-styled {
-    border: none; background: #fff; padding: 14px; border-radius: 16px; 
-    font-family: inherit; color: var(--text-gray); box-shadow: var(--shadow); 
-    width: 135px; text-align: center; appearance: none;
+    border: none; 
+    background: #fff; 
+    padding: 14px; 
+    border-radius: 16px; 
+    font-family: inherit; 
+    color: var(--text-gray); 
+    box-shadow: var(--shadow); 
+    width: 135px; /* Largeur fixe comme avant */
+    text-align: center;
+    appearance: none;
 }
+/* Cache l'icône calendrier moche */
 .date-input-styled::-webkit-calendar-picker-indicator {
     display: none !important;
     -webkit-appearance: none !important;
@@ -143,7 +163,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 /* Case du mois en cours */
 .cal-day.active-month { background: #fff; color: var(--text-main); border-color: #f1f3f5; }
 
-/* STYLE JOUR AVEC SÉANCE (GRIS) */
+/* STYLE JOUR AVEC SÉANCE (GRIS) - On ne touche pas */
 .cal-day.has-session { background-color: #e2e6ea !important; color: var(--text-main) !important; font-weight: 800; border-color: #dee2e6 !important; }
 .cal-day.has-session::after { display: none !important; }
 .cal-day.selected { background: #2d3436 !important; color: #fff !important; border-color: #2d3436 !important; }
@@ -160,12 +180,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .builder-label { font-size: 0.8rem; font-weight: 700; color: #b2bec3; margin-bottom: 5px; display: block; text-transform: uppercase; }
 .builder-item.editing-active { border: 2px solid var(--brand); background-color: #f8f9fa; transform: scale(1.02); }
 
-.prog-item { 
-    background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); 
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-    touch-action: pan-y;
-    position: relative;
-}
+.prog-item { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
 .prog-title { font-weight: 800; font-size: 1.1rem; color: #2d3436; }
 .prog-header-actions { display: flex; gap: 5px; }
 .prog-details-box { padding: 20px; background: #fff; margin-bottom: 20px; border-radius: 24px; box-shadow: var(--shadow); display: none; }
@@ -220,22 +235,15 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     z-index: 1000 !important;     
     padding-bottom: 0 !important;
     
+    /* MODIFICATION : Transition fluide pour le scroll */
     transition: transform 0.3s ease-in-out, opacity 0.3s ease !important;
 }
 
-/* Scroll cache */
+/* La barre disparaît vers le bas proprement */
 .nav-bar.scroll-hidden { 
     transform: translateY(150%) !important; 
     opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-/* Clavier cache */
-.nav-bar.keyboard-active {
-    transform: translateY(200%) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: transform 0.2s ease-out !important;
+    pointer-events: none !important; /* Pour ne pas cliquer dessus quand cachée */
 }
 
 .nav-item { background: transparent; color: #adb5bd; font-size: 0.9rem; font-weight: 700; border: none; }
@@ -250,38 +258,43 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
 .prog-line-name { flex: 1; white-space: normal !important; text-align: left; overflow: hidden; }
 .prog-line-info { flex-shrink: 0; white-space: nowrap !important; text-align: right; font-weight: bold; }
 
-/* --- STYLE BUILDER & DRAG AND DROP --- */
+/* --- STYLE BUILDER & DRAG AND DROP (GRIS CLAIR + CORRECTIF) --- */
 
+/* Conteneur de l'exercice dans la liste */
 .builder-item {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 16px;
     margin-bottom: 10px;
-    padding: 15px 40px 15px 15px;
+    padding: 15px 40px 15px 15px; /* Place pour la croix */
     position: relative;
     box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     display: block;
+    
+    /* Animation fluide */
     transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, opacity 0.2s;
-    touch-action: pan-y; 
+    touch-action: pan-y; /* Permet le scroll sauf si on lock */
 }
 
-/* Style quand on déplace */
-.builder-item.dragging-active, .prog-item.dragging-active {
+/* Style spécifique quand on déplace (GRIS NEUTRE, PAS VERT) */
+.builder-item.dragging-active {
     opacity: 0.9;
     background-color: #e9ecef !important;
     transform: scale(1.03);
     box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     z-index: 100;
     border: 2px solid #2d3436;
+    /* AJOUT CRUCIAL : Permet de détecter l'élément SOUS le doigt */
     pointer-events: none; 
 }
 
-/* Style survol */
-.builder-item.drag-over, .prog-item.drag-over {
+/* Style de la case sur laquelle on passe */
+.builder-item.drag-over {
     border: 2px dashed #b2bec3;
     background-color: #f8f9fa;
 }
 
+/* Croix de suppression (Visible) */
 .delete-x {
     display: block !important;
     position: absolute;
@@ -295,14 +308,56 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     z-index: 10;
 }
 
-.builder-click-zone { width: 100%; padding-right: 20px; }
+/* Zone de texte cliquable pour modifier */
+.builder-click-zone {
+    width: 100%;
+    padding-right: 20px;
+}
+
 .builder-exo-name { display: block; font-weight: 800; font-size: 1rem; color: #2d3436; margin-bottom: 4px; }
 .builder-exo-info { display: block; font-size: 0.85rem; font-weight: 600; color: #636e72; }
 
-/* Superset sans bordure gauche */
+/* Style Superset SANS bordure gauche */
 .builder-item-superset {
     border-left: none !important;
     background-color: #f8f9fa;
 }
 
+/* Sécurité pour cacher les anciens groupes de boutons s'ils traînent */
 .builder-actions-group { display: none !important; }
+
+/* --- GESTION CLAVIER (FORCE CACHÉ) --- */
+.nav-bar.keyboard-active {
+    transform: translateY(200%) !important; /* Force la barre vers le bas */
+    opacity: 0 !important;
+    pointer-events: none !important; /* Empêche de cliquer dessus par erreur */
+    transition: transform 0.2s ease-out !important; /* Disparition rapide */
+}
+
+/* --- DRAG & DROP PROGRAMMES (Menu Principal) --- */
+
+.prog-item {
+    /* On ajoute la transition et la gestion du tactile */
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    touch-action: pan-y;
+    position: relative;
+}
+
+/* Style quand on déplace un programme */
+.prog-item.dragging-active {
+    opacity: 0.9;
+    background-color: #e9ecef !important; /* Gris neutre */
+    transform: scale(1.03);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    z-index: 100;
+    border: 2px solid #2d3436;
+    pointer-events: none; /* Important pour détecter la case du dessous */
+}
+
+/* Style de la case survolée */
+.prog-item.drag-over {
+    border: 2px dashed #b2bec3;
+    background-color: #f8f9fa;
+}
+
+
