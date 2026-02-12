@@ -1,3 +1,17 @@
+/* --- BLOCAGE TOTAL DU REFRESH (Haut -> Bas) --- */
+html, body {
+    /* C'est cette ligne magique qui bloque le rafraîchissement */
+    overscroll-behavior-y: none !important; 
+    
+    /* Celle-ci bloque le retour page précédente (Gauche/Droite) */
+    overscroll-behavior-x: none !important; 
+    
+    height: 100%;       /* Indispensable pour que le blocage fonctionne */
+    overflow-x: hidden; /* Empêche le scroll horizontal */
+    margin: 0;
+    padding: 0;
+}
+
 /* --- VARIABLES --- */
 :root { --bg-body: #f8f9fa; --bg-card: #ffffff; --text-main: #2d3436; --text-gray: #636e72; --border-light: #e9ecef; --input-bg: #f1f3f5; --shadow: 0 2px 12px rgba(0,0,0,0.06); --btn-default-bg: #e9ecef; --btn-default-text: #495057; --brand: #2d3436; --accent: #2d3436; }
 
@@ -344,4 +358,5 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     border: 2px dashed #b2bec3;
     background-color: #f8f9fa;
 }
+
 
