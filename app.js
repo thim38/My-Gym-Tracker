@@ -16,21 +16,6 @@ let historyMode = 'list';
 let historyState = { view: 'categories', selected: null };
 let currentProgramKey = ''; 
 
-// --- SCROLL DETECTION ---
-let lastScrollTop = 0;
-const navBarElement = document.querySelector('.nav-bar');
-
-window.addEventListener('scroll', function() {
-    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (Math.abs(lastScrollTop - scrollTop) <= 5) return;
-    if (scrollTop > lastScrollTop && scrollTop > 50) {
-        if(navBarElement) navBarElement.classList.add('scroll-hidden');
-    } else {
-        if(navBarElement) navBarElement.classList.remove('scroll-hidden');
-    }
-    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
-}, false);
-
 // --- INITIALISATION ---
 document.addEventListener('DOMContentLoaded', () => {
     const savedSession = localStorage.getItem('gym_active_session');
@@ -1038,3 +1023,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 });
+
