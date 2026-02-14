@@ -119,15 +119,33 @@ function hasSessionData() {
 
 function handleProgramChange() {
     const select = document.getElementById('selectProgram');
-    const newKey = select.value;
-    if (!newKey) return;
-    if (newKey === currentProgramKey) return;
+    const newKey = select.value; // La nouvelle valeur (peut être "" ou "Push", etc.)
+    
+    // ÉTAPE 1 : SÉCURITÉ GLOBALE
+    // Si on a des données, on déclenche l'alerte, PEU IMPORTE ce qu'on a choisi.
     if (hasSessionData()) {
         if (!confirm("Tu as des données en cours. Changer de séance effacera tout. Continuer ?")) {
-            select.value = currentProgramKey;
-            return;
+            // Si tu cliques sur "Annuler", on remet l'ancien programme visuellement
+            select.value = currentProgramKey; 
+            return; // Et on arrête tout. Rien ne se passe.
         }
     }
+    
+    // ÉTAPE 2 : SI C'EST VALIDÉ (ou qu'il n'y avait rien)
+    
+    // Cas A : Tu as choisi l'option vide "Choisir une Séance"
+    if (newKey === "") {
+        currentProgramKey = "";
+        currentSessionLogs = [];
+        localStorage.removeItem('gym_active_session');
+        
+        // On vide l'écran pour revenir à l'état initial
+        document.getElementById('zoneTravail').innerHTML = "";
+        document.getElementById('zoneFinSeance').innerHTML = "";
+        return;
+    }
+    
+    // Cas B : Tu as choisi un autre programme (ex: Push)
     currentProgramKey = newKey;
     chargerInterface(true);
 }
@@ -1034,6 +1052,7 @@ document.addEventListener('click', function(e) {
         nav.classList.remove('keyboard-active');
     }
 });
+
 
 
 
