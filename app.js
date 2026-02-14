@@ -510,7 +510,12 @@ function sauvegarderProgrammeFinal() {
 }
 function startEditProgram(btn, e) { e.stopPropagation(); const name = btn.getAttribute('data-name'); resetBuilderForm(); tempBuilderList = JSON.parse(JSON.stringify(DB.progs[name])); document.getElementById('newProgName').value = name; document.getElementById('builderArea').classList.remove('hidden'); renderBuilder(); document.getElementById('builderArea').scrollIntoView({behavior: 'smooth'}); document.getElementById('btnSaveProg').innerText = "Mettre à jour la Séance"; }
 function deleteProg(name, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete DB.progs[name]; localStorage.setItem('gym_v8_progs', JSON.stringify(DB.progs)); updateSelectMenu(); renderProgramList(); chargerInterface(); } }
-function updateSelectMenu() { const s = document.getElementById('selectProgram'); s.innerHTML = '<option value="" disabled selected>Choisir une Séance</option>'; Object.keys(DB.progs).forEach(k => s.innerHTML += `<option value="${k}">${k}</option>`); }
+function updateSelectMenu() { 
+    const s = document.getElementById('selectProgram'); 
+    // J'ai enlevé 'disabled' ici. L'option a une valeur vide "".
+    s.innerHTML = '<option value="">Choisir une Séance</option>'; 
+    Object.keys(DB.progs).forEach(k => s.innerHTML += `<option value="${k}">${k}</option>`); 
+}
 
 // --- MODIF: VARIABLES DRAG & DROP PROGRAMMES ---
 let progDragSrcIndex = -1;
@@ -1029,5 +1034,6 @@ document.addEventListener('click', function(e) {
         nav.classList.remove('keyboard-active');
     }
 });
+
 
 
