@@ -704,29 +704,88 @@ function updateHistoryTitle() {
     else if (historyMode === 'weight') { titleEl.innerText = "Mon Suivi de Poids"; }
 }
 
-// --- LOGIQUE LISTE HISTORIQUE ---
 function renderHistory() { 
     if(historyMode !== 'list') return; 
     const container = document.getElementById('listeHistorique'); 
     const titleEl = document.getElementById('histMainTitle'); 
     const btnEl = document.getElementById('histActionBtn'); 
+    
     container.innerHTML = ''; 
-    if(DB.history.length === 0) { titleEl.innerText = "Types de Séances"; btnEl.innerText = "Effacer tout"; btnEl.onclick = resetHistoryOnly; container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée.</p>'; historyState.view = 'categories'; historyState.selected = null; return; } 
+    
+    if(DB.history.length === 0) { 
+        titleEl.innerText = "Types de Séances"; 
+        btnEl.innerText = "Effacer tout"; 
+        btnEl.onclick = resetHistoryOnly; 
+        container.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Aucune séance enregistrée.</p>'; 
+        historyState.view = 'categories'; 
+        historyState.selected = null; 
+        return; 
+    } 
+    
     if (historyState.view === 'categories') { 
-        titleEl.innerText = "Types de Séances"; btnEl.innerText = "Effacer tout"; btnEl.onclick = resetHistoryOnly; 
-        const groups = {}; DB.history.forEach(s => { if(!groups[s.programName]) groups[s.programName] = 0; groups[s.programName]++; }); 
-        Object.keys(groups).forEach(name => { const count = groups[name]; const btn = document.createElement('div'); btn.className = 'hist-category-btn'; btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; container.appendChild(btn); }); 
+        titleEl.innerText = "Types de Séances"; 
+        btnEl.innerText = "Effacer tout"; 
+        btnEl.onclick = resetHistoryOnly; 
+        
+        const groups = {}; 
+        DB.history.forEach(s => { if(!groups[s.programName]) groups[s.programName] = 0; groups[s.programName]++; }); 
+        
+        Object.keys(groups).forEach(name => { 
+            const count = groups[name]; 
+            const btn = document.createElement('div'); 
+            btn.className = 'hist-category-btn'; 
+            btn.innerHTML = `<span class="hist-cat-title">${name}</span> <span class="hist-count">${count}</span>`; 
+            btn.onclick = () => { historyState.view = 'details'; historyState.selected = name; renderHistory(); }; 
+            container.appendChild(btn); 
+        }); 
     } else { 
-        titleEl.innerText = "SÉANCES " + historyState.selected; btnEl.innerText = "Effacer " + historyState.selected; btnEl.onclick = () => deleteCategoryHistory(historyState.selected); 
-        const backBtn = document.createElement('div'); backBtn.className = 'btn-back-hist'; backBtn.innerText = 'Retour aux types de Séances'; backBtn.onclick = () => { historyState.view = 'categories'; historyState.selected = null; renderHistory(); }; container.appendChild(backBtn); 
+        // VUE DETAILS
+        titleEl.innerText = "SÉANCES " + historyState.selected; 
+        btnEl.innerText = "Effacer " + historyState.selected; 
+        btnEl.onclick = () => deleteCategoryHistory(historyState.selected); 
+        
+        const backBtn = document.createElement('div'); 
+        backBtn.className = 'btn-back-hist'; 
+        backBtn.innerText = 'Retour aux types de Séances'; 
+        backBtn.onclick = () => { historyState.view = 'categories'; historyState.selected = null; renderHistory(); }; 
+        container.appendChild(backBtn); 
+        
         const filtered = DB.history.filter(s => s.programName === historyState.selected); 
+        
         filtered.forEach(session => { 
             const wrapper = document.createElement('div'); wrapper.className = 'hist-session'; 
-            const header = document.createElement('div'); header.className = 'hist-header'; header.innerHTML = `<span class="hist-date-large">${session.date}</span>`; 
+            const header = document.createElement('div'); header.className = 'hist-header'; 
+            header.innerHTML = `<span class="hist-date-large">${session.date}</span>`; 
+            
             const body = document.createElement('div'); body.className = 'hist-body'; 
-            if(session.details && session.details.length > 0) { session.details.forEach(log => { let cleanPerf = log.perf.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ "); body.innerHTML += `<div class="hist-exo-line"><span class="hist-exo-name">${log.exo} <small style="color:#b2bec3;">(#${log.serie})</small></span><span class="hist-exo-perf">${cleanPerf}</span></div>`; }); } else { body.innerHTML = '<div style="padding:10px; color:#999">Pas de détails.</div>'; } 
-            header.onclick = () => { body.classList.toggle('open'); }; wrapper.appendChild(header); wrapper.appendChild(body); container.appendChild(wrapper); 
+            
+            if(session.details && session.details.length > 0) { 
+                session.details.forEach(log => { 
+                    let cleanPerf = log.perf.replace(/ \+ Dégressive: /g, " + ").replace(/Dégressive: /g, "+ "); 
+                    body.innerHTML += `<div class="hist-exo-line"><span class="hist-exo-name">${log.exo} <small style="color:#b2bec3;">(#${log.serie})</small></span><span class="hist-exo-perf">${cleanPerf}</span></div>`; 
+                }); 
+            } else { 
+                body.innerHTML = '<div style="padding:10px; color:#999">Pas de détails.</div>'; 
+            } 
+            
+            header.onclick = () => { body.classList.toggle('open'); }; 
+            
+            // --- LOGIQUE MAGIQUE : SI C'EST LA DATE DEMANDÉE, ON OUVRE ET ON SCROLL ---
+            if (historyState.targetDate && session.date === historyState.targetDate) {
+                body.classList.add('open');
+                // Petit délai pour laisser le temps au navigateur d'afficher la page avant de scroller
+                setTimeout(() => {
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 200);
+            }
+
+            wrapper.appendChild(header); 
+            wrapper.appendChild(body); 
+            container.appendChild(wrapper); 
         }); 
+        
+        // On remet à zéro la cible pour ne pas que ça le refasse tout le temps
+        historyState.targetDate = null;
     } 
 }
 
@@ -779,10 +838,22 @@ function showDayDetails(dateStr) {
         item.className = 'session-item-detail';
         item.style.cursor = 'pointer';
         
-        // --- MODIFICATION ICI : On passe aussi la DATE (s.date) ---
-        item.onclick = function() {
-            goToHistoryFromCalendar(s.programName, s.date);
-        };
+// --- FONCTION DE REDIRECTION (A METTRE TOUT A LA FIN DU FICHIER) ---
+function goToHistoryFromCalendar(progName, dateStr) {
+    historyMode = 'list';
+    historyState.view = 'details';
+    historyState.selected = progName;
+    
+    // On retient la date cible pour l'ouverture auto
+    historyState.targetDate = dateStr;
+    
+    // Changement d'onglet (Index 2 = Historique)
+    const historyBtn = document.querySelectorAll('.nav-item')[2];
+    switchTab('history', historyBtn, 2);
+    switchHistoryMode('list');
+    
+    renderHistory();
+}
         
         item.innerHTML = `
             <span style="font-weight:800; color:var(--text-main);">${s.programName}</span> 
@@ -1070,6 +1141,7 @@ document.addEventListener('click', function(e) {
         nav.classList.remove('keyboard-active');
     }
 });
+
 
 
 
