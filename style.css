@@ -58,20 +58,26 @@ h1 { text-align: center; margin-bottom: 30px; font-weight: 900; text-transform: 
 /* --- VIEW POIDS --- */
 .weight-input-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
 
-/* DATE AJUSTÉE (CORRIGÉE : Largeur Fixe + Sans icône calendrier) */
+/* --- CODE DATE CORRIGÉ (A COLLER A LA PLACE DES 2 ANCIENS) --- */
+
+/* 1. La case agrandie pour que "2026" rentre */
 .date-input-styled {
-    border: none; 
-    background: #fff; 
-    padding: 14px; 
-    border-radius: 16px; 
-    font-family: inherit; 
-    color: var(--text-gray); 
-    box-shadow: var(--shadow); 
-    width: 135px; /* Largeur fixe comme avant */
+    border: none;
+    background: #fff;
+    padding: 14px 5px; /* Marges réduites sur les côtés */
+    border-radius: 16px;
+    font-family: inherit;
+    color: var(--text-gray);
+    box-shadow: var(--shadow);
+    
+    width: 150px !important; /* LARGEUR AGRANDIE ICI */
+    
     text-align: center;
     appearance: none;
+    font-size: 0.95rem;
 }
-/* Cache l'icône calendrier moche */
+
+/* 2. Cache l'icône calendrier pour garder le design propre */
 .date-input-styled::-webkit-calendar-picker-indicator {
     display: none !important;
     -webkit-appearance: none !important;
@@ -377,6 +383,7 @@ button { border: none; font-weight: 700; border-radius: 16px; position: relative
     pointer-events: none !important;
     transition: transform 0.1s ease-out !important;
 }
+
 
 
 
