@@ -768,10 +768,28 @@ function showDayDetails(dateStr) {
     const listDiv = document.getElementById('daySessionsList');
     listDiv.innerHTML = '';
     const sessions = DB.history.filter(s => s.date === dateStr);
-    if (sessions.length === 0) { listDiv.innerHTML = '<div style="color:#b2bec3; font-style:italic;">Aucune séance ce jour-là.</div>'; return; }
+    
+    if (sessions.length === 0) { 
+        listDiv.innerHTML = '<div style="color:#b2bec3; font-style:italic;">Aucune séance ce jour-là.</div>'; 
+        return; 
+    }
+
     sessions.forEach(s => {
-        const item = document.createElement('div'); item.className = 'session-item-detail';
-        item.innerHTML = `<span>${s.programName}</span> <small style="color:#636e72">Voir Historique pour détails</small>`;
+        const item = document.createElement('div'); 
+        item.className = 'session-item-detail';
+        item.style.cursor = 'pointer';
+        
+        // --- MODIFICATION ICI : On passe aussi la DATE (s.date) ---
+        item.onclick = function() {
+            goToHistoryFromCalendar(s.programName, s.date);
+        };
+        
+        item.innerHTML = `
+            <span style="font-weight:800; color:var(--text-main);">${s.programName}</span> 
+            <small style="color:#636e72; display:flex; align-items:center; font-weight:600;">
+                Voir détails <span style="font-size:1.2em; margin-left:4px;">➔</span>
+            </small>
+        `;
         listDiv.appendChild(item);
     });
 }
@@ -1052,6 +1070,7 @@ document.addEventListener('click', function(e) {
         nav.classList.remove('keyboard-active');
     }
 });
+
 
 
 
